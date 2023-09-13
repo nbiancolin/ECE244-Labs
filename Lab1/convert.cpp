@@ -36,7 +36,7 @@ int main(void)
    // Check for validity of scale
    if( scale != DegF && scale != Degf &&
        scale != DegC && scale != Degc &&
-       scale != DegK && scale != Degk ) {
+       scale != DegK && scale != Degk || scale == NULL) {
 
       cerr << "\nError in input: Invalid scale `" << scale << "'\n";
       return -1;
