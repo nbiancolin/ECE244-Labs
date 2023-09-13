@@ -4,7 +4,7 @@ using namespace std;
 // Conversion constants
 #define CtoFRatio 1.80
 #define CtoFOffset 32.00
-#define CtoKOffset 27.30
+#define CtoKOffset 273.0
 
 // Scale indentifiers
 #define DegC 'C'
@@ -36,17 +36,17 @@ int main(void)
    // Check for validity of scale
    if( scale != DegF && scale != Degf &&
        scale != DegC && scale != Degc &&
-       scale != DegK && scale != Degk ) 
+       scale != DegK && scale != Degk ) {
 
       cerr << "\nError in input: Invalid scale `" << scale << "'\n";
-      return -1
+      return -1;
    }
 
    // Print the converted results
    cout << "\n" << inTemp << " " << scale << " is equivalent to:\n"
         << "\t" << toFahrenheit( inTemp, scale ) << " F, "
         << toCelsius( inTemp, scale ) << " C, and "
-        << toKelvin( inTemp, scale ) << " K\n" 
+        << toKelvin( inTemp, scale ) << " K\n" ;
    
    return 0;
 }
@@ -61,14 +61,17 @@ double toFahrenheit( double T, char scale )
    case DegF:
    case Degf:
       outT = T;
+      break;
       
    case DegC:
    case Degc:
       outT = T * CtoFRatio + CtoFOffset;
+      break;
 
    case DegK:
    case Degk:
       outT = ( T - CtoKOffset ) * CtoFRatio + CtoFOffset;
+      break;
 
    default:
       break; 
@@ -87,14 +90,17 @@ double toCelsius( double T, char scale )
 	   case DegF:
 	   case Degf:
 	      outT = ( T - CtoFOffset ) / CtoFRatio;
+          break; //sneaky with this one, I almost didn't notice it
 	      
 	   case DegC:
 	   case Degc:
 	      outT = T;
+          break;
 	
 	   case DegK:
 	   case Degk:
 	      outT = T - CtoKOffset;
+          break;
 	
 	   default:
 	      break; 
@@ -113,14 +119,17 @@ double toKelvin( double T, char scale )
 	   case DegF:
 	   case Degf:
 	      outT = ( T - CtoFOffset ) / CtoFRatio + CtoKOffset;
+          break;
 	      
 	   case DegC:
 	   case Degc:
 	      outT = T + CtoKOffset;
+          break;
 	
 	   case DegK:
 	   case Degk: 
 	      outT = T;
+          break;
 	
 	   default:
 	      break; 
