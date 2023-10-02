@@ -16,28 +16,86 @@
 #include "GameState.h"
 #include "globals.h"
 
-// Function prototypes (if you need)
+void checkWinner(int switcher, GameState& game_state){
+    switch(switcher){
+        case 0:
+            //diagonal check (since most likely way to win)
+            //board is 7 wide and 7 tall
+
+            for(int j = 0; j < boardSize - 3; j++){
+                for(int i = 0; i < boardSize - 3; i++){
+                    if(game_state.get_gameBoard(j,i) ==
+                    game_state.get_gameBoard(j+1,i+1) ==
+                    game_state.get_gameBoard(j+2,i+2) ==
+                    game_state.get_gameBoard(j+2,i+2)){
+                        game_state.set_winner(game_state.get_gameBoard(i, j));
+                        game_state.set_gameOver(true);
+                        return;
+                    }
+                }
+            }
+
+            break;
+        case 1:
+            //Horizontal check (next most likely)
+            for(int j = 0; j < boardSize; j++) {  //might be more efficient to do this the other way around but idc
+                for (int i = 0; i < boardSize - 3; i++) {
+                    if (game_state.get_gameBoard(j, i) ==
+                    game_state.get_gameBoard(j + 1, i) ==
+                    game_state.get_gameBoard(j + 2, i) ==
+                    game_state.get_gameBoard(j + 3, i)) {
+                        game_state.set_winner(game_state.get_gameBoard(i, j));
+                        game_state.set_gameOver(true);
+                        return;
+                    }
+                }
+            }
+            break;
+        case 2:
+            //Vertical check (who ever wins from one of these lmao)
+            for(int i = 0; i < boardSize - 3; i++){//represents column
+                for(int j = 0; j < boardSize; j++){//represents row
+                    if(game_state.get_gameBoard(j,i) ==
+                    game_state.get_gameBoard(j,i+1) ==
+                    game_state.get_gameBoard(j,i+2) ==
+                    game_state.get_gameBoard(j,i+3)) {
+                        game_state.set_winner(game_state.get_gameBoard(i, j));
+                        game_state.set_gameOver(true);
+                        return;
+                    }
+                }
+            }
+            break;
+    }
+}
 
 void playMove(GameState& game_state) {
 
-    //before this funcytion is called, it will be updated with its move and whatnot (selected row, etc will all be updated)
+    //function is only called if move is valid
+    //goal is solely to update the gamestate object
 
+    /**
+     * stuff that needs to get done (not necessarily in this order:
+     * turn value flipped
+     * moveValid reset
+     * gameOver updated if move was a winning move
+     *  by extension, update winner if that is the case
+     */
 
+    //flip turn value
 
-  // Change turn if move is valid,
+    bool turn = game_state.get_turn();
+    game_state.set_turn(!turn);
 
-  //check if move is valid
-  if(game_state->moveValid)
+    //reset moveValid (?)
 
-  //if move is valid, change turn
-  //else throw error
+    //check for winner
 
+    int switcher = 0;
 
-  // Change gameOver
-
-  //check if game if over
-
-  //if no, then pass
-  //else flip game over and return something probably
-  // Change winner
+    while(!game_state.get_gameOver() || switcher <3){ //that way, if/when a winning move is found, just flip the value then and there, and break, and no more checks will run
+        checkWinner(switcher, game_state);
+        switcher++;
+    }
+    return;
 }
