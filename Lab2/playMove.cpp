@@ -66,6 +66,8 @@ void checkWinner(int switcher, GameState& game_state){
                 }
             }
             break;
+        default:
+            return;
     }
 }
 
@@ -89,11 +91,13 @@ void playMove(GameState& game_state) {
 
     //reset moveValid (?)
 
+    game_state.set_moveValid(false);
+
     //check for winner
 
     int switcher = 0;
 
-    while(!game_state.get_gameOver() || switcher <3){ //that way, if/when a winning move is found, just flip the value then and there, and break, and no more checks will run
+    while(!game_state.get_gameOver() || switcher < 3){ //that way, if/when a winning move is found, just flip the value then and there, and break, and no more checks will run
         checkWinner(switcher, game_state);
         switcher++;
     }

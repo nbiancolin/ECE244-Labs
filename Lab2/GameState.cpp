@@ -30,12 +30,13 @@ GameState::GameState() { //constructor (I didn't see one defined anywhere, so be
 
 
 int GameState::get_selectedRow() {
-    return GameState->selectedRow; //which is it? this or the other
+    //return GameState->selectedRow; //which is it? this or the other
+    return selectedRow;
 }
 
 int GameState::get_selectedColumn() {
-    //return selectedColumn;
-    return GameState->selectedColumn;
+    return selectedColumn;
+    //return GameState->selectedColumn;
 }
 
 void GameState::set_selectedRow(int value) {
