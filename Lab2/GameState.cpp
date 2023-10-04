@@ -24,7 +24,7 @@ GameState::GameState() { //constructor (I didn't see one defined anywhere, so be
     gameOver = false;
     turn = true;
     winner = Empty;
-    gameBoard = Empty;
+    //gameBoard = int[boardSize][boardSize];
 }
 
 
@@ -40,55 +40,64 @@ int GameState::get_selectedColumn() {
 }
 
 void GameState::set_selectedRow(int value) {
-    GameState->selectedRow = value;
+    //GameState->selectedRow = value;
+    selectedRow = value;
     return;
 }
 
 void GameState::set_selectedColumn(int value) {
-    GameState->selectedColumn = value;
+    //GameState->selectedColumn = value;
+    selectedColumn = value;
     return;
 }
 
 bool GameState::get_moveValid() {
-    return GameState->moveValid;
+    //return GameState->moveValid;
+    return moveValid;
 }
 
 void GameState::set_moveValid(bool value){
-    GameState->moveValid = value
+    //GameState->moveValid = value
+    moveValid = value;
 }
 
 // Get the gameOver value
 bool GameState::get_gameOver(){
-    return GameState->gameOver;
+    //return GameState->gameOver;
+    return gameOver;
 }
 
 // Set the gameOver variable to value
 void GameState::set_gameOver(bool value){
-    GameState->gameOver = value;
-    return;
+    //GameState->gameOver = value;
+    //return;
+    gameOver = value;
 }
 
 // Get the value of turn
 bool GameState::get_turn(){
     return turn;
-    return GameState->turn;
+    //return GameState->turn;
 }
 
 // Set the value of turn
 void GameState::set_turn(bool value){
-    GameState->turn = value;
+    //GameState->turn = value;
+    turn = value;
     return;
 }
 
 // Get the value of winner
 int GameState::get_winner(){
-    return GameState->winner;
+    //return GameState->winner;
+    return winner;
 }
 
 // Set the value of winner;
 void GameState::set_winner(int value){
-    GameState->winner = value;
-    return;
+    //GameState->winner = value;
+    winner = value;
+    //return;
 }
 
 // Get the game board value at the board location at row and col
@@ -96,11 +105,12 @@ void GameState::set_winner(int value){
 // and if not it returns Empty
 int GameState::get_gameBoard(int row, int col){
     //check if row and col exist
-    if(row < boardSize && col < boardSize){  //n.b. I thought it was good practice to define constants with all caps? (so shouldn't this be BOARD_SIZE ?
+    if(row < boardSize && col < boardSize){  //n.b. I thought it was good practice to define constants with all caps? (so shouldn't this be BOARD_SIZE) ?
         GameState::set_selectedColumn(col); //do this? or not?
         GameState::set_selectedRow(row);
         if(GameState::get_moveValid()){
-            return GameState->gameBoard[row][col]; //what to return??
+            //return GameState->gameBoard[row][col]; //what to return??
+            return gameBoard[row][col];
         }
     }
     return Empty;
@@ -115,10 +125,12 @@ void GameState::set_gameBoard(int row, int col, int value){
         GameState::set_selectedColumn(col);
         GameState::set_selectedRow(row);
         if(value){
-            GameState->gameBoad[row][col] = value;
+            //GameState->gameBoad[row][col] = value;
+            gameBoard[row][col] = value;
             return;
         } else{
-            cerr << "Invalid value assigned for set_gameBoard"
+            //cerr << "Invalid value assigned for set_gameBoard"
+            //apparently we're snot
             return;
         }
     }

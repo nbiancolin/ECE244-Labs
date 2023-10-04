@@ -65,7 +65,7 @@ int main() {
   /**********************************************************************************/
   const int numOfRounds = 3;
   GameState game_state[numOfRounds]; //does this call the constructor?
-
+  cout << "Main is called";
   // Read one integer from the user that represents the column
   // the player would like to place their piece (R or Y) in
   // You can assume there will be no formatting errors in the input
@@ -123,11 +123,11 @@ int main() {
     
     // Call playMove
 
-    playMove(&game_state[round]);
+    playMove(game_state[round]);
 
     // Print the GameState object, as prescribed in the handout
 
-    printGameboard(&game_state[round]);
+    printGameboard(game_state[round]);
 
     // Check if a player won this round and if so handle accordingly
 
