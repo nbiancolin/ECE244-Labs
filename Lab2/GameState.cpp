@@ -24,6 +24,11 @@ GameState::GameState() { //constructor (I didn't see one defined anywhere, so be
     gameOver = false;
     turn = true;
     winner = Empty;
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            gameBoard[i][j] = Empty;
+        }
+    }
     //gameBoard = int[boardSize][boardSize];
 }
 
@@ -108,10 +113,10 @@ int GameState::get_gameBoard(int row, int col){
     if(row < boardSize && col < boardSize){  //n.b. I thought it was good practice to define constants with all caps? (so shouldn't this be BOARD_SIZE) ?
         GameState::set_selectedColumn(col); //do this? or not?
         GameState::set_selectedRow(row);
-        if(GameState::get_moveValid()){
+        //if(GameState::get_moveValid()){
             //return GameState->gameBoard[row][col]; //what to return??
             return gameBoard[row][col];
-        }
+        //}
     }
     return Empty;
 }
@@ -122,15 +127,15 @@ int GameState::get_gameBoard(int row, int col){
 void GameState::set_gameBoard(int row, int col, int value){
     //check if row and col exist
     if(row < boardSize && col < boardSize) {
-        GameState::set_selectedColumn(col);
-        GameState::set_selectedRow(row);
-        if(value){
+        //GameState::set_selectedColumn(col);
+        //GameState::set_selectedRow(row);
+        if(value == R || value == Y){
             //GameState->gameBoad[row][col] = value;
             gameBoard[row][col] = value;
             return;
         } else{
             //cerr << "Invalid value assigned for set_gameBoard"
-            //apparently we're snot
+            //apparently we're not supposed to do that
             return;
         }
     }

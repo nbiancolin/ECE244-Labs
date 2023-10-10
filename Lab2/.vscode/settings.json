@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/u/a/biancol6/ECE244-Labs/Lab2",
+            "binaryPath": "/u/a/biancol6/ECE244-Labs/Lab2/connectfour",
+            "binaryArgs": []
+        }
+    ]
+}
