@@ -5,5 +5,9 @@
             "binaryPath": "/u/a/biancol6/ECE244-Labs/Lab2/connectfour",
             "binaryArgs": []
         }
-    ]
+    ],
+    "files.associations": {
+        "*.ino": "arduino",
+        "ostream": "cpp"
+    }
 }

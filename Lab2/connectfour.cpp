@@ -47,7 +47,7 @@ void printGameboard(GameState& game_state){ //go on, take a guess at what this s
 }
 
 int gbEncoder(char value){
-    //does the opposite of the decoder
+    //does the opposite of the decoder (not used but its good practice to make this anyways)
     switch(value){
         case 'R':
             return R;
@@ -87,12 +87,14 @@ int main() {
   // the player would like to place their piece (R or Y) in
   // You can assume there will be no formatting errors in the input
 
-  cout << "Connect 4";
+  //cout << "Connect 4";
 
   int col;
   int round = 0;
+  int winners[3];
   
   for(int round = 0; round < numOfRounds; round++){
+    cout << "Game " << round+1 << endl;
   
     while (!game_state[round].get_gameOver()) {
         cout << "Enter column to place piece: ";
@@ -122,15 +124,15 @@ int main() {
         for(int i = 0; i < boardSize; i++){
             if(game_state[round].get_gameBoard(i, col) == Empty){
                 row = i;
-                break;
                 game_state[round].set_moveValid(true);
+                break;
             }
         }
 
         //some check here to make sure that the row is selected
         if(!game_state[round].get_moveValid()){
             cout << "Invalid column!" << endl;
-            break;
+            continue;
         }
         cout << "column chosen: " << col << endl;
 
@@ -162,10 +164,16 @@ int main() {
 
         //should only be run if there is a winner
         char winner = gbDecoder(game_state[round].get_winner());
-        cout << "Winner is: " << winner << endl;
-
+        cout << winner << " won this round!" << endl;
+        winners[round] = game_state[round].get_winner();
         // Check if a player won this match and if so handle accordingly
         }
+        if( winners[0] + winners[1] + winners[2] >1 || winners[0] + winners[1] + winners[2] < -1){
+            break;
+        }
     }
+
+    cout << ((winners[0] + winners[1] + winners[2] > 0) ? "R" : "Y") << " won the match!" << endl;
+
 }
   
