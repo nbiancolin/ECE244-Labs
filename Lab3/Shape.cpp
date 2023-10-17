@@ -13,3 +13,56 @@
 //  ECE244 Student:
 //  Write the implementation (and only the implementation) of the Shape class below
 
+#include "Shape.h"
+#include "globals.h;
+
+
+string Shape::getType(){
+    return type;
+}
+string Shape::getName(){
+    return name;
+}
+int Shape::getXlocation(){
+    return x_location;
+}
+int Shape::getYlocation(){
+    return y_location;
+}
+int Shape::getXsize(){
+    return x_size;
+}
+int Shape::getYsize(){
+    return y_size;
+}
+
+void Shape::setType(string t){
+    type = t;
+}
+
+void Shape::setName(string n){
+    name = n;
+}
+
+void Shape::setXlocation(int x_loc){
+    x_location = x_loc;
+}
+void Shape::setYlocation(int y_loc){
+    y_location = y_loc;
+}
+
+void Shape::setXsize(int x_sz){
+    x_size = x_sz;
+}
+
+void Shape::setYsize(int y_sz) {
+    y_size = y_sz;
+}
+
+void Shape::setRotate(int angle){
+    rotation = angle;
+}
+
+void draw(){ //a "tostring" method of sorts
+//what should this look like lmao
+}

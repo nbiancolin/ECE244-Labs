@@ -52,7 +52,7 @@ int main() {
         // Check for the command and act accordingly
         // ECE244 Student: Insert your code here
         
-        
+        //lmao what
         
         
         // Once the command has been processed, prompt for the
