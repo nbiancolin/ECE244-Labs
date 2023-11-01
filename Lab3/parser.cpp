@@ -33,6 +33,10 @@ int max_shapes;
 // helper functions you write here
 
 int readIn(stringstream &ss, int *buffer){ //we love polymorphism
+    if(ss.str().empty()) {
+        error(9);
+        return 0;
+    }
     ss >> buffer;
     if(ss.fail()){
         error(2);
@@ -41,6 +45,10 @@ int readIn(stringstream &ss, int *buffer){ //we love polymorphism
 }
 
 int readIn(stringstream &ss, string &buffer){
+    if(ss.str().empty()) {
+        error(9);
+        return 0;
+    }
     ss >> buffer;
     if(ss.fail()){
         error(2);
@@ -135,11 +143,11 @@ void create(stringstream &ss){
     Shape *create = *shapesArray[shapeCount];
 
     readIn(ss, name);  //read in name and error check
-    if(ss.fail()) goto exit;
+    if(ss.fail()) return;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(name == keyWordsList[i]) goto invShape;
     }
-    if(shapeExists(name)){
+    if(shapeExists(name) >=0){
         error(4, name);
         return;
     }
@@ -200,12 +208,7 @@ void create(stringstream &ss){
 
     return;
 
-exit:
-    {
-        error(9);
-        return;
-    };
-
+exit: return;
 
 invShape:
     {
@@ -220,38 +223,60 @@ invType:
 
 }
 
-void delete(stringstream &ss){
-    string arg;
-    ss >> arg;
-
-    if(ss.fai()){
-
-    }
-}
-
-
-
 void move(stringstream &ss){
-    string buffer;
-    int buf;
+    string name;
+    int x, y, temp;
 
-    ss >> buffer;
-    if(ss.fail()) {
-        error(2);
-        return;
-    }
-    //find shape in 'database'
-
-
-
-
-
-    //update location
-
-    ss >> buf;
-
+    temp = readIn(ss, name) == 1;
+    if(temp == 1) {
+        int loc = shapeExists(name);
+        if (loc == -1) {
+            error(5, name);
+            return;
+        } else {
+            Shape *modify = *shapesArray[loc];
+            temp = readIn(ss, &x);
+            if (temp == 0) return;
+            temp = readIn(ss, &y);
+            if (temp == 0) return;
+            if (x >= 0 * *y >= 0) {
+                modify->setXlocation(x);
+                modify->setYlocation(y);
+                cout << "Moved " << name << " to " << x << " " << y << endl;
+                return;
+            } else {
+                error(7);
+                return;
+            }
+        }
+    } else return;
 }
 
+void rotate(stringstream &ss){
+    string name;
+    int angle, temp;
+
+    temp = readIn(ss, name);
+    if(temp == 1){
+        int loc = shapeExists(name);
+        if(loc == -1){
+            error(5, name);
+            return;
+        } else {
+            Shape *modify = *shapesArray[loc];
+            temp = readIn(ss, &angle);
+            if (temp == 0) return;
+            if(angle >= 0 && angle <= 360){
+                modify->setRotate(angle);
+                cout << "Rotated " << name << " by " << angle << " degrees" << endl;
+                return;
+            } else{
+                error(7);
+                return;
+            }
+        }
+    } else return;
+}
 
 
 /**
