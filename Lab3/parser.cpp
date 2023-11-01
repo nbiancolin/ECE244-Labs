@@ -56,6 +56,18 @@ int readIn(stringstream &ss, string &buffer){
     } else return 1;
 }
 
+int readCmd(stringstream &ss, string &buffer){
+    if(ss.str().empty()){
+        error(1);
+        return 0;
+    }
+    ss >> buffer;
+    if(ss.fail()){
+        error(1);
+        return 0;
+    } return 1;
+}
+
 
 void bananas(int num, string &val){ //this is the method I came up with for "function overloading". Yes, its bananas
     cout << "Error: "
@@ -78,7 +90,7 @@ void error(int num){
     bananas(num, "foo");
 }
 
-void error(int num, string &val){
+void error(int num, string &val){ //polymorphism >>
     bananas(num, val);
 }
 
@@ -87,18 +99,6 @@ int shapeExists(string name){
         if (name == shapesArray[i]->getName()) return i;
     }
     return -1;
-}
-
-
-string commandParser(stringtream &ss){ //function to read the command name
-    string cmd;
-    ss >> cmd;
-    if(ss.fail()) {
-        ss.clear();
-        error(1);
-        return "oops"; //error case to be
-    }
-    return cmd;
 }
 
 void maxShapes(stringstream &ss){ //TODO probably fix this
@@ -200,6 +200,14 @@ void create(stringstream &ss){
     }
 
 
+    if(type == "circle"){ //check for circle being equal
+        if(x != y){
+            error(7);
+            return;
+        }
+    }
+
+
     ++shapeCount;
     *create = new Shape(name, type, xloc, xsz, yloc, ysz);
 
@@ -231,9 +239,9 @@ void move(stringstream &ss){
     if(temp == 1) {
         int loc = shapeExists(name);
         if (loc == -1) {
-            error(5, name);
+            error(5);
             return;
-        } else {
+        }else {
             Shape *modify = *shapesArray[loc];
             temp = readIn(ss, &x);
             if (temp == 0) return;
@@ -259,8 +267,8 @@ void rotate(stringstream &ss){
     temp = readIn(ss, name);
     if(temp == 1){
         int loc = shapeExists(name);
-        if(loc == -1){
-            error(5, name);
+        if(loc == -1) {
+            error(5);
             return;
         } else {
             Shape *modify = *shapesArray[loc];
@@ -277,6 +285,31 @@ void rotate(stringstream &ss){
         }
     } else return;
 }
+
+void draw(stringstream &ss){
+    string name;
+
+    int temp = readIn(ss, name);
+    if (temp == 0) return 0;
+    if(name != "all"){
+        int loc = shapeExists(name);
+        if(loc == -1) {
+            error(5);
+            return;
+        } else{
+            Shape *sel = *shapesArray[loc];
+            cout << "Drew " << sel->draw();
+            return;
+        }
+    } else {
+        cout << "Drew all shaapes" << endl; //TODO: should this be after all shapes are drawn?
+        for(int i = 0; i < shapeCount; i++){
+            *shapesArray[i]->draw();
+        }
+    }
+
+}
+
 
 
 /**
@@ -302,26 +335,19 @@ int main() {
         // The only way this can fail is if the eof is encountered
         //lineStream >> command;
 
-        string cmd = commandParser(lineStream);
-        if(cmd != "oops") {
+        int temp = readIn(lineStream, command);
+        if(temp == 1) {
             //do command stuff
-            switch(cmd){
-                case "maxShapes": maxShapes(linestream); //TODO: recap how to pass by reference
-                case "create": create(linestream);
-                case "move": move(linestream);
-                case "rotate": rotate(linestream);
+            switch(command){
+                case "maxShapes": maxShapes(lineStream); //TODO: recap how to pass by reference
+                case "create": create(lineStream);
+                case "move": move(lineStream);
+                case "rotate": rotate(lineStream);
+                case "draw": draw(lineStream);
+                case "delete": delete(lineStream);
                 default: error(1);
             }
-
-
-
-
-
-
         }
-
-
-
         
         // Once the command has been processed, prompt for the
         // next command
