@@ -111,7 +111,7 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
         return;
     }
 
-    //free all of shapesArray
+
     /*
     if(**shapesArray != NULL){
         //free array
@@ -122,6 +122,7 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
         shapeCount = 0;
     }*/
 
+    //free all of shapesArray
     if (shapesArray != nullptr) {
         // Free each object in the array
         for (int i = 0; i < shapeCount; i++) {
@@ -351,14 +352,6 @@ void del(stringstream &ss){
     return;
 }
 
-
-
-/**
- * https://cplusplus.com/reference/sstream/stringstream/
- * ^^ whatever this weird stringstream is, there thankfully exists documentation for it
- */
-
-
 int main() {
 
     string line;
@@ -397,4 +390,3 @@ int main() {
     
     return 0;
 }
-
