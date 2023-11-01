@@ -32,6 +32,33 @@ int max_shapes;
 // ECE244 Student: you may want to add the prototype of
 // helper functions you write here
 
+void bananas(int num, string &val){ //this is the method I came up with for "function overloading". Yes, its bananas
+    cout << "Error: "
+    switch(num){
+        case 1: cout << "invalid command";
+        case 2: cout << "invalid argument";
+        case 3: cout << "invalid shape name";
+        case 4: cout << "shape "<< val << " exists";
+        case 5: cout << "shape "<< val << " not found";
+        case 6: cout << "invalid shape type";
+        case 7: cout << "invalid value";
+        case 8: cout << "too many arguments";
+        case 9: cout << "too few arguments";
+        case 10: cout << "shape array is full";
+        default: cout << "programmer made an oopsie";
+    }
+}
+
+void error(int num){
+    bananas(num, "foo");
+}
+
+void error(int num, string &val){ //polymorphism >>
+    bananas(num, val);
+}
+
+
+
 int readIn(stringstream &ss, int *buffer){ //we love polymorphism
     if(ss.str().empty()) {
         error(9);
@@ -67,32 +94,6 @@ int readCmd(stringstream &ss, string &buffer){ //specifically for reading in com
         return 0;
     }
     return 1;
-}
-
-
-void bananas(int num, string &val){ //this is the method I came up with for "function overloading". Yes, its bananas
-    cout << "Error: "
-    switch(num){
-        case 1: cout << "invalid command";
-        case 2: cout << "invalid argument";
-        case 3: cout << "invalid shape name";
-        case 4: cout << "shape "<< val << " exists";
-        case 5: cout << "shape "<< val << " not found";
-        case 6: cout << "invalid shape type";
-        case 7: cout << "invalid value";
-        case 8: cout << "too many arguments";
-        case 9: cout << "too few arguments";
-        case 10: cout << "shape array is full";
-        default: cout << "programmer made an oopsie";
-    }
-}
-
-void error(int num){
-    bananas(num, "foo");
-}
-
-void error(int num, string &val){ //polymorphism >>
-    bananas(num, val);
 }
 
 int shapeExists(string name){
