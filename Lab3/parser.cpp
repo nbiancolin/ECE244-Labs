@@ -45,22 +45,8 @@ int readIn(stringstream &ss, string &buffer){
     if(ss.fail()){
         error(2);
         return 0;
-    }
-    for(int i = 0; i < NUM_KEYWORDS; ++i){
-        if(buffer == keyWordsList[i]){
-            //error(?)
-            return -1;
-        }
-
-    }
-
-
-    return 1;
+    } else return 1;
 }
-
-
-
-
 
 
 void bananas(int num, string &val){ //this is the method I came up with for "function overloading". Yes, its bananas
@@ -78,7 +64,6 @@ void bananas(int num, string &val){ //this is the method I came up with for "fun
         case 10: cout << "shape array is full";
         default: cout << "programmer made an oopsie";
     }
-
 }
 
 void error(int num){
@@ -89,13 +74,12 @@ void error(int num, string &val){
     bananas(num, val);
 }
 
-void resetShape(int num){
-    Shape *modify = shapesArray[num];
-
-    modify->setName()
+int shapeExists(string name){
+    for(int i = 0; i < shapeCount; i++){
+        if (name == shapesArray[i]->getName()) return i;
+    }
+    return -1;
 }
-
-
 
 
 string commandParser(stringtream &ss){ //function to read the command name
@@ -117,7 +101,6 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
         ss.clear();
         return;
     }
-
 
     //free all of shapesArray
     if(**shapesArray != NULL){
@@ -149,18 +132,26 @@ void create(stringstream &ss){
     int xloc, yloc, xsz, ysz;
     int flag;
 
-    if(shapeCount >= max_shapes){
-        error(10);
+    Shape *create = *shapesArray[shapeCount];
+
+    readIn(ss, name);  //read in name and error check
+    if(ss.fail()) goto exit;
+    for(int i = 0; i < NUM_KEYWORDS; ++i){
+        if(name == keyWordsList[i]) goto invShape;
+    }
+    if(shapeExists(name)){
+        error(4, name);
         return;
     }
 
-    readIn(ss, name);
+    readIn(ss, type); //same for type
     if(ss.fail()) goto exit;
-    //if name in keywords throw error
-
-    readIn(ss, type);
-    if(ss.fail()) goto exit;
-    //if type not in types go to invshape
+    for(int i = 0; i < NUM_KEYWORDS; ++i){
+        if(type == keyWordsList[i]) goto invShape;
+    }
+    for(int i = 0; i < NUM_TYPES; ++i){
+        if(type == shapeTypesList[i]) goto invType;
+    }
 
     readIn(ss, &xloc);
     if(ss.fail()) goto exit;
@@ -190,37 +181,41 @@ void create(stringstream &ss){
         return;
     }
 
-    if(ss.peek() != EOF){ //should this be ghe nullptr or what
+    if(!ss.str().empty()){ //checks if there are more arguments in the stringstream
         error(8);
         return;
     }
 
-    Shape *create = *shapesArray[index];
-    ++index;
-
-    *create = new Shape(name, type, xloc, yloc, xsz, ysz);
-
-    cout << "created";
-    create->draw();
-
-    return;
-exit: //incorrect arg // too few args
-    {
-        //check if remaining string if null, if not return error 9, if yes then
-
-        if(ss.peek() == EOF){
-            error(9)
-        }
-
-        error(9);
-        ss.clear();
+    if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
+        error(10);
         return;
     }
 
-invalid:
+
+    ++shapeCount;
+    *create = new Shape(name, type, xloc, xsz, yloc, ysz);
+
+    cout << "created ";
+    create->draw();
+
+    return;
+
+exit:
     {
-        error(7);
-        return
+        error(9);
+        return;
+    };
+
+
+invShape:
+    {
+        error(3);
+        return;
+    }
+invType:
+    {
+        error(6);
+        return;
     }
 
 }
