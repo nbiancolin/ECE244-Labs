@@ -56,7 +56,7 @@ int readIn(stringstream &ss, string &buffer){
     } else return 1;
 }
 
-int readCmd(stringstream &ss, string &buffer){
+int readCmd(stringstream &ss, string &buffer){ //specifically for reading in commands so it throws the right error
     if(ss.str().empty()){
         error(1);
         return 0;
@@ -65,7 +65,8 @@ int readCmd(stringstream &ss, string &buffer){
     if(ss.fail()){
         error(1);
         return 0;
-    } return 1;
+    }
+    return 1;
 }
 
 
@@ -111,14 +112,32 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
     }
 
     //free all of shapesArray
+    /*
     if(**shapesArray != NULL){
         //free array
         for(int i = 0; i < max_shapes; i++){
             delete shapesArray[i];
         }
         delete [] shapesArray;
-        index = 0;
+        shapeCount = 0;
+    }*/
+
+    if (shapesArray != nullptr) {
+        // Free each object in the array
+        for (int i = 0; i < shapeCount; i++) {
+            if (shapesArray[i] != nullptr) {
+                delete shapesArray[i];
+            }
+        }
+
+        // Now, delete the array itself
+        delete[] shapesArray;
+
+        // Reset the pointer and count
+        shapesArray = nullptr;
+        shapeCount = 0;
     }
+
 
     //proceed with dynamically allocating memory;
     *shapesArray = new Shape[size];
@@ -306,8 +325,30 @@ void draw(stringstream &ss){
         for(int i = 0; i < shapeCount; i++){
             *shapesArray[i]->draw();
         }
+        return;
+    }
+}
+
+void del(stringstream &ss){
+    string name;
+
+    int temp = readIn(ss, name);
+    if (temp == 0) return 0;
+    if(name != "all"){
+        int loc = shapeExists(name);
+        if(loc == -1){
+            error(5);
+            return;
+        } else {
+            Shape *sel = *shapesArray[loc];
+            delete sel;
+            cout << "Deleted shape" << name << endl;
+        }
+    } else {
+
     }
 
+    return;
 }
 
 
@@ -335,18 +376,16 @@ int main() {
         // The only way this can fail is if the eof is encountered
         //lineStream >> command;
 
-        int temp = readIn(lineStream, command);
+        if(lineStream.str() == EOF) break;
+        int temp = readCmd(lineStream, command);
         if(temp == 1) {
-            //do command stuff
-            switch(command){
-                case "maxShapes": maxShapes(lineStream); //TODO: recap how to pass by reference
-                case "create": create(lineStream);
-                case "move": move(lineStream);
-                case "rotate": rotate(lineStream);
-                case "draw": draw(lineStream);
-                case "delete": delete(lineStream);
-                default: error(1);
-            }
+            if(command == "maxShapes") maxShapes(lineStream);
+            else if(command == "create") create(lineStream);
+            else if(command == "move") move(lineStream);
+            else if(command == "rotate") rotate(lineStream);
+            else if(command == "draw") draw(lineStream);
+            else if(command == "delete") del(lineStream);
+            else error(1);
         }
         
         // Once the command has been processed, prompt for the
