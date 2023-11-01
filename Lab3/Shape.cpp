@@ -14,7 +14,19 @@
 //  Write the implementation (and only the implementation) of the Shape class below
 
 #include "Shape.h"
-#include "globals.h;
+#include "globals.h";
+
+#include <iostream>
+
+Shape(string n, string t, int x_loc, int x_sz, int y_loc, int y_sz){
+    name = n;
+    type = t;
+    x_location = x_loc;
+    x_size = x_sz;
+    y_location = y+loc;
+    y_size = y_sz;
+}
+
 
 
 string Shape::getType(){
@@ -64,5 +76,5 @@ void Shape::setRotate(int angle){
 }
 
 void draw(){ //a "tostring" method of sorts
-//what should this look like lmao
+
 }
