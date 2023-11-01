@@ -59,12 +59,12 @@ void error(int num, string &val){ //polymorphism >>
 
 
 
-int readIn(stringstream &ss, int *buffer){ //we love polymorphism
+int readIn(stringstream &ss, int &buffer){ //we love polymorphism
     if(ss.str().empty()) {
         error(9);
         return 0;
     }
-    ss >> buffer;
+    ss >> &buffer;
     if(ss.fail()){
         error(2);
         return 0;
@@ -182,28 +182,28 @@ void create(stringstream &ss){
         if(type == shapeTypesList[i]) goto invType;
     }
 
-    readIn(ss, &xloc);
+    readIn(ss, xloc);
     if(ss.fail()) goto exit;
     if(xloc < 0){
         error(7);
         return;
     }
 
-    readIn(ss, &yloc);
+    readIn(ss, yloc);
     if(ss.fail()) goto exit;
     if(yloc < 0){
         error(7);
         return;
     }
 
-    readIn(ss, &xsz);
+    readIn(ss, xsz);
     if(ss.fail()) goto exit;
     if(xsz < 0){
         error(7);
         return;
     }
 
-    readIn(ss, &ysz);
+    readIn(ss, ysz);
     if(ss.fail()) goto exit;
     if(ysz < 0){
         error(7);
@@ -264,9 +264,9 @@ void move(stringstream &ss){
             return;
         }else {
             Shape *modify = *shapesArray[loc];
-            temp = readIn(ss, &x);
+            temp = readIn(ss, x);
             if (temp == 0) return;
-            temp = readIn(ss, &y);
+            temp = readIn(ss, y);
             if (temp == 0) return;
             if (x >= 0 * *y >= 0) {
                 modify->setXlocation(x);
@@ -293,7 +293,7 @@ void rotate(stringstream &ss){
             return;
         } else {
             Shape *modify = *shapesArray[loc];
-            temp = readIn(ss, &angle);
+            temp = readIn(ss, angle);
             if (temp == 0) return;
             if(angle >= 0 && angle <= 360){
                 modify->setRotate(angle);
