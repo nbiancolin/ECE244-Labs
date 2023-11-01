@@ -144,7 +144,8 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
 }
 
 void create(stringstream &ss){
-    string name, type;
+    string name;
+    string type;
     int xloc, yloc, xsz, ysz;
     int flag;
 
@@ -155,39 +156,83 @@ void create(stringstream &ss){
 
     readIn(ss, name);
     if(ss.fail()) goto exit;
-    Shape *create = *shapesArray[index];
-    ++index;
+    //if name in keywords throw error
 
     readIn(ss, type);
     if(ss.fail()) goto exit;
+    //if type not in types go to invshape
 
     readIn(ss, &xloc);
     if(ss.fail()) goto exit;
+    if(xloc < 0){
+        error(7);
+        return;
+    }
 
     readIn(ss, &yloc);
     if(ss.fail()) goto exit;
+    if(yloc < 0){
+        error(7);
+        return;
+    }
 
     readIn(ss, &xsz);
     if(ss.fail()) goto exit;
+    if(xsz < 0){
+        error(7);
+        return;
+    }
 
     readIn(ss, &ysz);
     if(ss.fail()) goto exit;
-
-    if(ss.peek() == EOF){
-        error(8);
-        return; //TODO: should clear entry or no?
+    if(ysz < 0){
+        error(7);
+        return;
     }
 
+    if(ss.peek() != EOF){ //should this be ghe nullptr or what
+        error(8);
+        return;
+    }
+
+    Shape *create = *shapesArray[index];
+    ++index;
+
+    *create = new Shape(name, type, xloc, yloc, xsz, ysz);
+
+    cout << "created";
+    create->draw();
+
     return;
-exit:
+exit: //incorrect arg // too few args
     {
+        //check if remaining string if null, if not return error 9, if yes then
+
+        if(ss.peek() == EOF){
+            error(9)
+        }
+
         error(9);
-        //reset all values
-        //return
+        ss.clear();
+        return;
+    }
+
+invalid:
+    {
+        error(7);
+        return
     }
 
 }
 
+void delete(stringstream &ss){
+    string arg;
+    ss >> arg;
+
+    if(ss.fai()){
+
+    }
+}
 
 
 

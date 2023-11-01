@@ -76,5 +76,5 @@ void Shape::setRotate(int angle){
 }
 
 void draw(){ //a "tostring" method of sorts
-
+    cout << name << ": " << type << xloc << yloc << xsz << ysz << endl;
 }
