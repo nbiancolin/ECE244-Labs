@@ -36,21 +36,32 @@ void bananas(int num, string &val){ //this is the method I came up with for "fun
     cout << "Error: ";
     switch(num){
         case 1: cout << "invalid command";
+        break;
         case 2: cout << "invalid argument";
+        break;
         case 3: cout << "invalid shape name";
+        break;
         case 4: cout << "shape "<< val << " exists";
+        break;
         case 5: cout << "shape "<< val << " not found";
+        break;
         case 6: cout << "invalid shape type";
+        break;
         case 7: cout << "invalid value";
+        break;
         case 8: cout << "too many arguments";
+        break;
         case 9: cout << "too few arguments";
+        break;
         case 10: cout << "shape array is full";
+        break;
         default: cout << "programmer made an oopsie";
     }
+    cout << endl;
 }
 
 void error(int num){
-    bananas(num, "foo");
+    bananas(num, (string &) "foo");
 }
 
 void error(int num, string &val){ //polymorphism >>
@@ -64,7 +75,7 @@ int readIn(stringstream &ss, int &buffer){ //we love polymorphism
         error(9);
         return 0;
     }
-    ss >> &buffer;
+    ss >> buffer;
     if(ss.fail()){
         error(2);
         return 0;
@@ -96,14 +107,14 @@ int readCmd(stringstream &ss, string &buffer){ //specifically for reading in com
     return 1;
 }
 
-int shapeExists(string name){
+int locShape(string name){
     for(int i = 0; i < shapeCount; i++){
         if (name == shapesArray[i]->getName()) return i;
     }
     return -1;
 }
 
-void maxShapes(stringstream &ss){ //TODO probably fix this
+void maxShapes(stringstream &ss){  //works from initial testing!
     int size;
     ss >> size;
     if(ss.fail()){
@@ -142,7 +153,7 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
 
 
     //proceed with dynamically allocating memory;
-    *shapesArray = new Shape[size];
+    shapesArray = new Shape*[size];
 
     max_shapes = size;
 
@@ -155,20 +166,19 @@ void maxShapes(stringstream &ss){ //TODO probably fix this
     return;
 }
 
-void create(stringstream &ss){
+void create(stringstream &ss){ //does not work from inital testing
     string name;
     string type;
     int xloc, yloc, xsz, ysz;
-    int flag;
 
-    Shape *create = *shapesArray[shapeCount];
+    Shape *create = shapesArray[shapeCount];
 
     readIn(ss, name);  //read in name and error check
     if(ss.fail()) return;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(name == keyWordsList[i]) goto invShape;
     }
-    if(shapeExists(name) >=0){
+    if(locShape(name) >=0){
         error(4, name);
         return;
     }
@@ -222,7 +232,7 @@ void create(stringstream &ss){
 
 
     if(type == "circle"){ //check for circle being equal
-        if(x != y){
+        if(xsz != ysz){
             error(7);
             return;
         }
@@ -230,7 +240,7 @@ void create(stringstream &ss){
 
 
     ++shapeCount;
-    *create = new Shape(name, type, xloc, xsz, yloc, ysz);
+    create = new Shape(name, type, xloc, xsz, yloc, ysz);
 
     cout << "created ";
     create->draw();
@@ -258,17 +268,17 @@ void move(stringstream &ss){
 
     temp = readIn(ss, name) == 1;
     if(temp == 1) {
-        int loc = shapeExists(name);
+        int loc = locShape(name);
         if (loc == -1) {
-            error(5);
+            error(5, name);
             return;
         }else {
-            Shape *modify = *shapesArray[loc];
+            Shape *modify = shapesArray[loc];
             temp = readIn(ss, x);
             if (temp == 0) return;
             temp = readIn(ss, y);
             if (temp == 0) return;
-            if (x >= 0 * *y >= 0) {
+            if (x >= 0 && y >= 0) {
                 modify->setXlocation(x);
                 modify->setYlocation(y);
                 cout << "Moved " << name << " to " << x << " " << y << endl;
@@ -287,12 +297,12 @@ void rotate(stringstream &ss){
 
     temp = readIn(ss, name);
     if(temp == 1){
-        int loc = shapeExists(name);
+        int loc = locShape(name);
         if(loc == -1) {
-            error(5);
+            error(5, name);
             return;
         } else {
-            Shape *modify = *shapesArray[loc];
+            Shape *modify = shapesArray[loc];
             temp = readIn(ss, angle);
             if (temp == 0) return;
             if(angle >= 0 && angle <= 360){
@@ -311,21 +321,22 @@ void draw(stringstream &ss){
     string name;
 
     int temp = readIn(ss, name);
-    if (temp == 0) return 0;
+    if (temp == 0) return;
     if(name != "all"){
-        int loc = shapeExists(name);
+        int loc = locShape(name);
         if(loc == -1) {
-            error(5);
+            error(5, name);
             return;
         } else{
-            Shape *sel = *shapesArray[loc];
-            cout << "Drew " << sel->draw();
+            Shape *sel = shapesArray[loc];
+            cout << "Drew ";
+            sel->draw();
             return;
         }
     } else {
         cout << "Drew all shapes" << endl; //TODO: should this be after all shapes are drawn?
         for(int i = 0; i < shapeCount; i++){
-            *shapesArray[i]->draw();
+            shapesArray[i]->draw();
         }
         return;
     }
@@ -335,21 +346,25 @@ void del(stringstream &ss){
     string name;
 
     int temp = readIn(ss, name);
-    if (temp == 0) return 0;
+    if (temp == 0) return;
     if(name != "all"){
-        int loc = shapeExists(name);
+        int loc = locShape(name);
         if(loc == -1){
-            error(5);
+            error(5, name);
             return;
         } else {
-            Shape *sel = *shapesArray[loc];
-            delete sel;
+            Shape *sel = shapesArray[loc];
+            delete sel; //TODO: Might be a memory leak
             cout << "Deleted shape" << name << endl;
         }
     } else {
-
+        for (int i = 0; i < shapeCount; i++) {
+            if (shapesArray[i] != nullptr) {
+                delete shapesArray[i];
+            }
+        }
+        cout << "Deleted: all shapes";
     }
-
     return;
 }
 
@@ -370,7 +385,7 @@ int main() {
         // The only way this can fail is if the eof is encountered
         //lineStream >> command;
 
-        if(lineStream.str() == EOF) break;
+        //if(lineStream.str() == EOF) break;  I think this is redundant but who knows
         int temp = readCmd(lineStream, command);
         if(temp == 1) {
             if(command == "maxShapes") maxShapes(lineStream);
