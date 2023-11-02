@@ -72,11 +72,13 @@ void error(int num, string &val){ //polymorphism >>
 
 int readIn(stringstream &ss, int &buffer){ //we love polymorphism
     if(ss.str().empty()) {
+        cout << "err in read" << endl; //TODO: remove this
         error(9);
         return 0;
     }
     ss >> buffer;
     if(ss.fail()){
+        cout << "err in read" << endl; //TODO: remove this
         error(2);
         return 0;
     } else return 1;
@@ -84,11 +86,13 @@ int readIn(stringstream &ss, int &buffer){ //we love polymorphism
 
 int readIn(stringstream &ss, string &buffer){
     if(ss.str().empty()) {
+        cout << "err in read" << endl; //TODO: remove this
         error(9);
         return 0;
     }
     ss >> buffer;
     if(ss.fail()){
+        cout << "err in read" << endl; //TODO: remove this
         error(2);
         return 0;
     } else return 1;
@@ -178,20 +182,23 @@ void create(stringstream &ss){ //does not work from inital testing
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(name == keyWordsList[i]) goto invShape;
     }
-    if(locShape(name) >=0){
+    if(locShape(name) != -1){
         error(4, name);
         return;
     }
 
+    if(ss.str().empty()) goto noMas;
     readIn(ss, type); //same for type
     if(ss.fail()) goto exit;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(type == keyWordsList[i]) goto invShape;
     }
     for(int i = 0; i < NUM_TYPES; ++i){
-        if(type == shapeTypesList[i]) goto invType;
+        if(type == shapeTypesList[i]) break;
+        if(i == NUM_TYPES-1) goto invType;
     }
 
+    if(ss.str().empty()) goto noMas;
     readIn(ss, xloc);
     if(ss.fail()) goto exit;
     if(xloc < 0){
@@ -199,6 +206,7 @@ void create(stringstream &ss){ //does not work from inital testing
         return;
     }
 
+    if(ss.str().empty()) goto noMas;
     readIn(ss, yloc);
     if(ss.fail()) goto exit;
     if(yloc < 0){
@@ -206,6 +214,7 @@ void create(stringstream &ss){ //does not work from inital testing
         return;
     }
 
+    if(ss.str().empty()) goto noMas;
     readIn(ss, xsz);
     if(ss.fail()) goto exit;
     if(xsz < 0){
@@ -213,6 +222,7 @@ void create(stringstream &ss){ //does not work from inital testing
         return;
     }
 
+    if(ss.str().empty()) goto noMas;
     readIn(ss, ysz);
     if(ss.fail()) goto exit;
     if(ysz < 0){
@@ -247,7 +257,14 @@ void create(stringstream &ss){ //does not work from inital testing
 
     return;
 
-exit: return;
+exit: return; //this was something at some point and now it's not and I don't want to break everything so it's staying in
+
+noMas:
+    {
+        error(9);
+        return;
+    };
+
 
 invShape:
     {
@@ -266,7 +283,7 @@ void move(stringstream &ss){
     string name;
     int x, y, temp;
 
-    temp = readIn(ss, name) == 1;
+    temp = readIn(ss, name);
     if(temp == 1) {
         int loc = locShape(name);
         if (loc == -1) {
