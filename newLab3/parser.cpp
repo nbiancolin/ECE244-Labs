@@ -180,28 +180,28 @@ void create(stringstream &ss){ //does not work from inital testing
     string type;
     int xloc, yloc, xsz, ysz;
 
-    //Shape *create = shapesArray[shapeCount]; whoops this shit didnt work mb homies
+    Shape *create = shapesArray[shapeCount]; //whoops this shit didnt work mb homies
 
-    cout << "shape created" << endl;
+    //cout << "shape created" << endl;
     readIn(ss, name);  //read in name and error check
     if(ss.fail()) return;
 
-    cout << "first value read in" << endl;
+    //cout << "first value read in" << endl;
 
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(name == keyWordsList[i]) goto invShape;
     }
-    cout << 1;
+    //cout << 1;
     for(int i = 0; i < NUM_TYPES; ++i){
         if(name == shapeTypesList[i]) goto invShape;
     }
-    cout << 2;
+    //cout << 2;
     if(locShape(name) != -1){
         error(4, name);
         return;
     }
     cout << 3 << endl;
-    cout << "first value checks ok" << endl;
+    //cout << "first value checks ok" << endl;
 
     if(!ss.peek()) goto noMas; //TODO: these do nothing
     readIn(ss, type); //same for type
@@ -213,7 +213,7 @@ void create(stringstream &ss){ //does not work from inital testing
         if(type == shapeTypesList[i]) break;
         if(i == NUM_TYPES-1) goto invType;
     }
-    cout << "second value read in" << endl;
+    //cout << "second value read in" << endl;
 
     if(ss.str().empty()) goto noMas;
     readIn(ss, xloc);
@@ -222,7 +222,7 @@ void create(stringstream &ss){ //does not work from inital testing
         error(7);
         return;
     }
-    cout << "third value read in" << endl;
+    //cout << "third value read in" << endl;
 
     if(ss.str().empty()) goto noMas;
     readIn(ss, yloc);
@@ -231,7 +231,7 @@ void create(stringstream &ss){ //does not work from inital testing
         error(7);
         return;
     }
-    cout << "fourth value read in" << endl;
+    //cout << "fourth value read in" << endl;
 
     if(ss.str().empty()) goto noMas;
     readIn(ss, xsz);
@@ -240,7 +240,7 @@ void create(stringstream &ss){ //does not work from inital testing
         error(7);
         return;
     }
-    cout << "fifth value read in" << endl;
+    //cout << "fifth value read in" << endl;
 
     if(ss.str().empty()) goto noMas;
     readIn(ss, ysz);
@@ -249,13 +249,13 @@ void create(stringstream &ss){ //does not work from inital testing
         error(7);
         return;
     }
-    cout << "6th value read in" << endl;
+    //cout << "6th value read in" << endl;
 
     if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
         error(8);
         return;
     }
-    cout << "empty check evaluated" << endl;
+    //cout << "empty check evaluated" << endl;
 
     if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
                                     //TODO: Figure out why this doesnt work
@@ -263,7 +263,7 @@ void create(stringstream &ss){ //does not work from inital testing
         error(10);
         return;
     }
-    cout << "confirmed space in array" << endl;
+    //cout << "confirmed space in array" << endl;
 
 
     if(type == "circle"){ //check for circle being equal
@@ -272,16 +272,22 @@ void create(stringstream &ss){ //does not work from inital testing
             return;
         }
     }
-    cout << "cicle check" << endl;
+    //cout << "cicle check" << endl;
 
 
 
-    //create = new Shape(name, type, xloc, xsz, yloc, ysz);
-    shapesArray[shapeCount] = new Shape(name, type, xloc, xsz, yloc, ysz);
+    create = new Shape(name, type, xloc, xsz, yloc, ysz);
+    //shapesArray[shapeCount] = new Shape(name, type, xloc, xsz, yloc, ysz);
+    //++shapeCount;
+    shapesArray[shapeCount] = create;
+
     ++shapeCount;
 
     cout << "created ";
-    shapesArray[shapeCount]->draw();
+
+    create->draw();
+
+    //shapesArray[shapeCount-1]->draw();
 
     return;
 
