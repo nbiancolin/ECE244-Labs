@@ -70,7 +70,7 @@ void error(int num, string &val){ //polymorphism >>
 
 
 
-int readIn(stringstream &ss, int &buffer){ //we love polymorphism
+int readIn(stringstream &ss, int &buffer){
     if(ss.str().empty()) {
         cout << "err in read" << endl; //TODO: remove this
         error(9);
@@ -84,7 +84,7 @@ int readIn(stringstream &ss, int &buffer){ //we love polymorphism
     } else return 1;
 }
 
-int readIn(stringstream &ss, string &buffer){
+int readIn(stringstream &ss, string &buffer){ //we love polymorphism
     if(ss.str().empty()) {
         cout << "err in read" << endl; //TODO: remove this
         error(9);
@@ -111,9 +111,14 @@ int readCmd(stringstream &ss, string &buffer){ //specifically for reading in com
     return 1;
 }
 
-int locShape(string name){
-    for(int i = 0; i < shapeCount; i++){
-        if (name == shapesArray[i]->getName()) return i;
+int locShape(string &name){ //TODO: This does not work
+    if (shapesArray == nullptr) {
+        cout << "null arr" << endl;
+        return -1; // or some appropriate error handling
+    }
+    for(int i = 0; i < shapeCount; ++i){
+        cout << shapesArray[i]->getName() << endl;
+        if (shapesArray[i] != nullptr && name == shapesArray[i]->getName()) return i;
     }
     return -1;
 }
@@ -175,23 +180,28 @@ void create(stringstream &ss){ //does not work from inital testing
     string type;
     int xloc, yloc, xsz, ysz;
 
-    Shape *create = shapesArray[shapeCount];
+    //Shape *create = shapesArray[shapeCount]; whoops this shit didnt work mb homies
 
     cout << "shape created" << endl;
     readIn(ss, name);  //read in name and error check
     if(ss.fail()) return;
 
+    cout << "first value read in" << endl;
+
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(name == keyWordsList[i]) goto invShape;
     }
+    cout << 1;
     for(int i = 0; i < NUM_TYPES; ++i){
         if(name == shapeTypesList[i]) goto invShape;
     }
+    cout << 2;
     if(locShape(name) != -1){
         error(4, name);
         return;
     }
-    cout << "first value read in" << endl;
+    cout << 3 << endl;
+    cout << "first value checks ok" << endl;
 
     if(!ss.peek()) goto noMas; //TODO: these do nothing
     readIn(ss, type); //same for type
@@ -241,13 +251,14 @@ void create(stringstream &ss){ //does not work from inital testing
     }
     cout << "6th value read in" << endl;
 
-    if(ss.peek()){ //checks if there are more arguments in the stringstream
+    if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
         error(8);
         return;
     }
     cout << "empty check evaluated" << endl;
 
     if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
+                                    //TODO: Figure out why this doesnt work
         cout << ss.str() << endl;
         error(10);
         return;
@@ -264,11 +275,13 @@ void create(stringstream &ss){ //does not work from inital testing
     cout << "cicle check" << endl;
 
 
+
+    //create = new Shape(name, type, xloc, xsz, yloc, ysz);
+    shapesArray[shapeCount] = new Shape(name, type, xloc, xsz, yloc, ysz);
     ++shapeCount;
-    create = new Shape(name, type, xloc, xsz, yloc, ysz);
 
     cout << "created ";
-    create->draw();
+    shapesArray[shapeCount]->draw();
 
     return;
 
@@ -305,14 +318,14 @@ void move(stringstream &ss){
             error(5, name);
             return;
         }else {
-            Shape *modify = shapesArray[loc];
+            //Shape *modify = shapesArray[loc]; also doesnt work
             temp = readIn(ss, x);
             if (temp == 0) return;
             temp = readIn(ss, y);
             if (temp == 0) return;
             if (x >= 0 && y >= 0) {
-                modify->setXlocation(x);
-                modify->setYlocation(y);
+                shapesArray[loc]->setXlocation(x);
+                shapesArray[loc]->setYlocation(y);
                 cout << "Moved " << name << " to " << x << " " << y << endl;
                 return;
             } else {
@@ -334,11 +347,11 @@ void rotate(stringstream &ss){
             error(5, name);
             return;
         } else {
-            Shape *modify = shapesArray[loc];
+            //Shape *modify = shapesArray[loc]; no workie
             temp = readIn(ss, angle);
             if (temp == 0) return;
             if(angle >= 0 && angle <= 360){
-                modify->setRotate(angle);
+                shapesArray[loc]->setRotate(angle);
                 cout << "Rotated " << name << " by " << angle << " degrees" << endl;
                 return;
             } else{
@@ -360,9 +373,9 @@ void draw(stringstream &ss){
             error(5, name);
             return;
         } else{
-            Shape *sel = shapesArray[loc];
+            //Shape *sel = shapesArray[loc]; sadge
             cout << "Drew ";
-            sel->draw();
+            shapesArray[loc]->draw();
             return;
         }
     } else {
@@ -385,8 +398,8 @@ void del(stringstream &ss){
             error(5, name);
             return;
         } else {
-            Shape *sel = shapesArray[loc];
-            delete sel; //TODO: Might be a memory leak
+            //Shape *sel = shapesArray[loc]; I forgor how pointers work
+            delete shapesArray[loc]; //TODO: Might be a memory leak
             cout << "Deleted shape" << name << endl;
         }
     } else {
