@@ -72,13 +72,13 @@ void error(int num, string &val){ //polymorphism >>
 
 int readIn(stringstream &ss, int &buffer){
     if(ss.str().empty()) {
-        cout << "err in read" << endl; //TODO: remove this
+        //cout << "err in read" << endl; //TODO: remove this
         error(9);
         return 0;
     }
     ss >> buffer;
     if(ss.fail()){
-        cout << "err in read" << endl; //TODO: remove this
+        //cout << "err in read" << endl; //TODO: remove this
         error(2);
         return 0;
     } else return 1;
@@ -86,13 +86,13 @@ int readIn(stringstream &ss, int &buffer){
 
 int readIn(stringstream &ss, string &buffer){ //we love polymorphism
     if(ss.str().empty()) {
-        cout << "err in read" << endl; //TODO: remove this
+        //cout << "err in read" << endl; //TODO: remove this
         error(9);
         return 0;
     }
     ss >> buffer;
     if(ss.fail()){
-        cout << "err in read" << endl; //TODO: remove this
+        //cout << "err in read" << endl; //TODO: remove this
         error(2);
         return 0;
     } else return 1;
@@ -113,11 +113,11 @@ int readCmd(stringstream &ss, string &buffer){ //specifically for reading in com
 
 int locShape(string &name){ //TODO: This does not work
     if (shapesArray == nullptr) {
-        cout << "null arr" << endl;
+        //cout << "null arr" << endl; //we love it when the debugger doesnt work
         return -1; // or some appropriate error handling
     }
     for(int i = 0; i < shapeCount; ++i){
-        cout << shapesArray[i]->getName() << endl;
+        //cout << shapesArray[i]->getName() << endl;
         if (shapesArray[i] != nullptr && name == shapesArray[i]->getName()) return i;
     }
     return -1;
@@ -200,10 +200,10 @@ void create(stringstream &ss){ //does not work from inital testing
         error(4, name);
         return;
     }
-    cout << 3 << endl;
+    //cout << 3 << endl;
     //cout << "first value checks ok" << endl;
 
-    if(!ss.peek()) goto noMas; //TODO: these do nothing
+    if(ss.peek() == EOF) goto noMas; //TODO: these do nothing
     readIn(ss, type); //same for type
     if(ss.fail()) goto exit;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
@@ -215,7 +215,7 @@ void create(stringstream &ss){ //does not work from inital testing
     }
     //cout << "second value read in" << endl;
 
-    if(ss.str().empty()) goto noMas;
+    if(ss.peek() == EOF) goto noMas;
     readIn(ss, xloc);
     if(ss.fail()) goto exit;
     if(xloc < 0){
@@ -224,7 +224,7 @@ void create(stringstream &ss){ //does not work from inital testing
     }
     //cout << "third value read in" << endl;
 
-    if(ss.str().empty()) goto noMas;
+    if(ss.peek() == EOF) goto noMas;
     readIn(ss, yloc);
     if(ss.fail()) goto exit;
     if(yloc < 0){
@@ -233,7 +233,7 @@ void create(stringstream &ss){ //does not work from inital testing
     }
     //cout << "fourth value read in" << endl;
 
-    if(ss.str().empty()) goto noMas;
+    if(ss.peek() == EOF) goto noMas;
     readIn(ss, xsz);
     if(ss.fail()) goto exit;
     if(xsz < 0){
@@ -242,7 +242,7 @@ void create(stringstream &ss){ //does not work from inital testing
     }
     //cout << "fifth value read in" << endl;
 
-    if(ss.str().empty()) goto noMas;
+    if(ss.peek() == EOF) goto noMas;
     readIn(ss, ysz);
     if(ss.fail()) goto exit;
     if(ysz < 0){
@@ -259,7 +259,7 @@ void create(stringstream &ss){ //does not work from inital testing
 
     if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
                                     //TODO: Figure out why this doesnt work
-        cout << ss.str() << endl;
+        //cout << ss.str() << endl;
         error(10);
         return;
     }
@@ -406,7 +406,7 @@ void del(stringstream &ss){
         } else {
             //Shape *sel = shapesArray[loc]; I forgor how pointers work
             delete shapesArray[loc]; //TODO: Might be a memory leak
-            cout << "Deleted shape" << name << endl;
+            cout << "Deleted shape " << name << endl;
         }
     } else {
         for (int i = 0; i < shapeCount; i++) {
@@ -414,7 +414,8 @@ void del(stringstream &ss){
                 delete shapesArray[i];
             }
         }
-        cout << "Deleted: all shapes";
+        shapeCount = 0;
+        cout << "Deleted: all shapes" << endl;
     }
     return;
 }
