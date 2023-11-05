@@ -130,23 +130,14 @@ int locShape(string &name){
 
 void maxShapes(stringstream &ss){  //works from initial testing!
     int size;
-    ss >> size;
-    if(ss.fail()){
-        error(2);
-        ss.clear();
+    int temp;
+
+    temp = readIn(ss, size);
+    if(temp == 0) return;
+    if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+        error(8);
         return;
     }
-
-
-    /*
-    if(**shapesArray != NULL){
-        //free array
-        for(int i = 0; i < max_shapes; i++){
-            delete shapesArray[i];
-        }
-        delete [] shapesArray;
-        shapeCount = 0;
-    }*/
 
     //free all of shapesArray
     if (shapesArray != nullptr) {
@@ -170,10 +161,6 @@ void maxShapes(stringstream &ss){  //works from initial testing!
     shapesArray = new Shape*[size];
 
     max_shapes = size;
-
-    //for(int i = 0; i < size; i++){
-    //    shapesArray[i] = new Shape();
-    //}
 
 
     cout << "New database: max shapes is " << size << endl;
@@ -434,14 +421,14 @@ void move(stringstream &ss){
             error(5, name);
             return;
         }else {
-            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
-                error(8);
-                return;
-            }
             temp = readIn(ss, x);
             if (temp == 0) return;
             temp = readIn(ss, y);
             if (temp == 0) return;
+            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+                error(8);
+                return;
+            }
             if (x >= 0 && y >= 0) {
                 shapesArray[loc]->setXlocation(x);
                 shapesArray[loc]->setYlocation(y);
@@ -466,12 +453,12 @@ void rotate(stringstream &ss){
             error(5, name);
             return;
         } else {
+            temp = readIn(ss, angle);
+            if (temp == 0) return;
             if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
                 error(8);
                 return;
             }
-            temp = readIn(ss, angle);
-            if (temp == 0) return;
             if(angle >= 0 && angle <= 360){
                 shapesArray[loc]->setRotate(angle);
                 cout << "Rotated " << name << " by " << angle << " degrees" << endl;
