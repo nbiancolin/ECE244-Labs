@@ -71,29 +71,31 @@ void error(int num, string &val){ //polymorphism >>
 
 
 int readIn(stringstream &ss, int &buffer){
-    if(ss.str().empty()) {
-        //cout << "err in read" << endl; //TODO: remove this
+    if(ss.peek() == EOF) { //checks for too few arguements
         error(9);
         return 0;
     }
-    ss >> buffer;
-    if(ss.fail()){
-        //cout << "err in read" << endl; //TODO: remove this
+    string temp;
+    ss >> temp;
+    if(temp != to_string(stoi(temp))){ //checks for invalid inputs (in case they pass 1a or smtg)
+        error(2);
+        return 0;
+    }
+    buffer = stoi(temp);
+    if(ss.fail()){ //this check might be redunant but no way in hell Im taking it out
         error(2);
         return 0;
     } else return 1;
 }
 
 int readIn(stringstream &ss, string &buffer){ //we love polymorphism
-    if(ss.str().empty()) {
-        //cout << "err in read" << endl; //TODO: remove this
+    if(ss.peek() == EOF) { //checks for too few arguments
         error(9);
         return 0;
     }
     ss >> buffer;
     if(ss.fail()){
-        //cout << "err in read" << endl; //TODO: remove this
-        error(2);
+        error(2); //checks if somehow this fails, idk how but like whatever
         return 0;
     } else return 1;
 }
@@ -111,17 +113,20 @@ int readCmd(stringstream &ss, string &buffer){ //specifically for reading in com
     return 1;
 }
 
-int locShape(string &name){ //TODO: This does not work
+int locShape(string &name){
     if (shapesArray == nullptr) {
         //cout << "null arr" << endl; //we love it when the debugger doesnt work
         return -1; // or some appropriate error handling
     }
     for(int i = 0; i < shapeCount; ++i){
         //cout << shapesArray[i]->getName() << endl;
-        if (shapesArray[i] != nullptr && name == shapesArray[i]->getName()) return i;
+        if (shapesArray[i] != nullptr)
+            if(name == shapesArray[i]->getName()) return i;
     }
     return -1;
 }
+
+
 
 void maxShapes(stringstream &ss){  //works from initial testing!
     int size;
@@ -175,7 +180,111 @@ void maxShapes(stringstream &ss){  //works from initial testing!
     return;
 }
 
-void create(stringstream &ss){ //does not work from inital testing
+void create(stringstream &ss){
+    string name, type;
+    int xloc, yloc, xsz, ysz;
+
+    int temp;
+
+    temp = readIn(ss, name);
+    if(!temp) return;
+    //error checking for name
+    for(int i = 0; i < NUM_KEYWORDS; ++i){
+        if(name == keyWordsList[i]){
+            error(3);
+            return;
+        }
+    }
+    //cout << 1;
+    for(int i = 0; i < NUM_TYPES; ++i){
+        if(name == shapeTypesList[i]) {
+            error(3);
+            return;
+        }
+    }
+
+
+    temp = readIn(ss, type);
+    if(!temp) return; //TODO: should explicitly check or no?
+    for(int i = 0; i < NUM_KEYWORDS; ++i){
+        if(type == keyWordsList[i]) {
+            error(6);
+            return;
+        }
+    } //error checking for type
+    for(int i = 0; i < NUM_TYPES; ++i){
+        if(type == shapeTypesList[i]) break;
+        if(i == NUM_TYPES-1){
+            error(6);
+            return;
+        }
+    }
+
+    if(locShape(name) != -1){
+        error(4, name);
+        return;
+    }
+
+    temp = readIn(ss, xloc);
+    if(!temp) return;
+    if(xloc < 0){
+        error(7);
+        return;
+    }
+
+    temp = readIn(ss, yloc);
+    if(!temp) return;
+    if(yloc < 0){
+        error(7);
+        return;
+    }
+
+    temp = readIn(ss, xsz);
+    if(!temp) return;
+    if(xsz < 0){
+        error(7);
+        return;
+    }
+
+    temp = readIn(ss, ysz);
+    if(!temp) return;
+    if(ysz < 0){
+        error(7);
+        return;
+    }
+
+    if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+        error(8);
+        return;
+    }
+    //cout << "empty check evaluated" << endl;
+
+    if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
+        error(10);
+        return;
+    }
+
+
+    if(type == "circle"){ //check for circle being equal
+        if(xsz != ysz){
+            error(7);
+            return;
+        }
+    }
+
+
+    Shape* create = new Shape(name, type, xloc, xsz, yloc, ysz);
+    shapesArray[shapeCount] = create;
+    ++shapeCount;
+
+    cout << "Created ";
+    create->draw();
+
+}
+
+
+/* DEPRECATED
+void create(stringstream &ss){ //deprecated
     string name;
     string type;
     int xloc, yloc, xsz, ysz;
@@ -203,7 +312,7 @@ void create(stringstream &ss){ //does not work from inital testing
     //cout << 3 << endl;
     //cout << "first value checks ok" << endl;
 
-    if(ss.peek() == EOF) goto noMas; //TODO: these do nothing
+    if(ss.peek() == EOF) goto noMas;
     readIn(ss, type); //same for type
     if(ss.fail()) goto exit;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
@@ -283,7 +392,7 @@ void create(stringstream &ss){ //does not work from inital testing
 
     ++shapeCount;
 
-    cout << "created ";
+    cout << "Created ";
 
     create->draw();
 
@@ -311,7 +420,8 @@ invType:
         return;
     }
 
-}
+}*/
+
 
 void move(stringstream &ss){
     string name;
@@ -324,7 +434,10 @@ void move(stringstream &ss){
             error(5, name);
             return;
         }else {
-            //Shape *modify = shapesArray[loc]; also doesnt work
+            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+                error(8);
+                return;
+            }
             temp = readIn(ss, x);
             if (temp == 0) return;
             temp = readIn(ss, y);
@@ -353,7 +466,10 @@ void rotate(stringstream &ss){
             error(5, name);
             return;
         } else {
-            //Shape *modify = shapesArray[loc]; no workie
+            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+                error(8);
+                return;
+            }
             temp = readIn(ss, angle);
             if (temp == 0) return;
             if(angle >= 0 && angle <= 360){
@@ -379,7 +495,10 @@ void draw(stringstream &ss){
             error(5, name);
             return;
         } else{
-            //Shape *sel = shapesArray[loc]; sadge
+            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+                error(8);
+                return;
+            }
             cout << "Drew ";
             shapesArray[loc]->draw();
             return;
@@ -387,7 +506,7 @@ void draw(stringstream &ss){
     } else {
         cout << "Drew all shapes" << endl; //TODO: should this be after all shapes are drawn?
         for(int i = 0; i < shapeCount; i++){
-            shapesArray[i]->draw();
+            if(shapesArray[i] != nullptr) shapesArray[i]->draw();
         }
         return;
     }
@@ -398,6 +517,10 @@ void del(stringstream &ss){
 
     int temp = readIn(ss, name);
     if (temp == 0) return;
+    if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+        error(8);
+        return;
+    }
     if(name != "all"){
         int loc = locShape(name);
         if(loc == -1){
@@ -405,7 +528,8 @@ void del(stringstream &ss){
             return;
         } else {
             //Shape *sel = shapesArray[loc]; I forgor how pointers work
-            delete shapesArray[loc]; //TODO: Might be a memory leak
+            delete shapesArray[loc]; //TODO: doesnt work
+            shapesArray[loc] = nullptr;
             cout << "Deleted shape " << name << endl;
         }
     } else {

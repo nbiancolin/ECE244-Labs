@@ -1,0 +1,3 @@
+C:\Users\Nicholas\AppData\Local\Programs\CLion\bin\cmake\win\x64\bin\cmake.exe -E rm -f CMakeFiles\newLab3.dir/objects.a
+C:\Users\Nicholas\AppData\Local\Programs\CLion\bin\mingw\bin\ar.exe qc CMakeFiles\newLab3.dir/objects.a @CMakeFiles\newLab3.dir\objects1.rsp
+C:\Users\Nicholas\AppData\Local\Programs\CLion\bin\mingw\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\newLab3.dir/objects.a -Wl,--no-whole-archive -o newLab3.exe -Wl,--out-implib,libnewLab3.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\newLab3.dir\linkLibs.rsp
