@@ -172,7 +172,7 @@ void create(stringstream &ss){
     string name, type;
     int xloc, yloc, xsz, ysz;
 
-    int temp;
+    int temp = 0;
 
     temp = readIn(ss, name);
     if(!temp) return;
@@ -193,7 +193,7 @@ void create(stringstream &ss){
 
 
     temp = readIn(ss, type);
-    if(!temp) return; //TODO: should explicitly check or no?
+    if(!temp) return;
     for(int i = 0; i < NUM_KEYWORDS; ++i){
         if(type == keyWordsList[i]) {
             error(6);
@@ -246,6 +246,7 @@ void create(stringstream &ss){
         return;
     }
     //cout << "empty check evaluated" << endl;
+
 
     if(shapeCount >= max_shapes){ //final check to ensure there is space in the array
         error(10);
@@ -505,22 +506,26 @@ void del(stringstream &ss){
 
     int temp = readIn(ss, name);
     if (temp == 0) return;
-    if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
-        error(8);
-        return;
-    }
     if(name != "all"){
         int loc = locShape(name);
         if(loc == -1){
             error(5, name);
             return;
         } else {
+            if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+                error(8);
+                return;
+            }
             //Shape *sel = shapesArray[loc]; I forgor how pointers work
             delete shapesArray[loc]; //TODO: doesnt work
             shapesArray[loc] = nullptr;
             cout << "Deleted shape " << name << endl;
         }
     } else {
+        if(ss.peek() != EOF){ //checks if there are more arguments in the stringstream
+            error(8);
+            return;
+        }
         for (int i = 0; i < shapeCount; i++) {
             if (shapesArray[i] != nullptr) {
                 delete shapesArray[i];
