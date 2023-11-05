@@ -79,7 +79,7 @@ int readIn(stringstream &ss, int &buffer){
     ss >> temp;
 
     for(char c : temp){
-        if(!isdigit(c)){
+        if(!isdigit(c) || c == '-'){
             error(2);
             return 0;
         }
