@@ -71,21 +71,22 @@ void error(int num, string &val){ //polymorphism >>
 
 
 int readIn(stringstream &ss, int &buffer){
-    if(ss.peek() == EOF) { //checks for too few arguements
+    if(ss.eof()) { //checks for too few arguements
         error(9);
         return 0;
     }
     string temp;
     ss >> temp;
-    if(temp != to_string(stoi(temp))){ //checks for invalid inputs (in case they pass 1a or smtg)
-        error(2);
-        return 0;
+
+    for(char c : temp){
+        if(!isdigit(c)){
+            error(2);
+            return 0;
+        }
     }
     buffer = stoi(temp);
-    if(ss.fail()){ //this check might be redunant but no way in hell Im taking it out
-        error(2);
-        return 0;
-    } else return 1;
+    return 1;
+
 }
 
 int readIn(stringstream &ss, string &buffer){ //we love polymorphism
