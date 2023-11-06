@@ -1,0 +1,3 @@
+D:/User Stuff/Documents/GitHub/ECE244-Labs/Lab4/cmake-build-debug/CMakeFiles/Lab4.dir
+D:/User Stuff/Documents/GitHub/ECE244-Labs/Lab4/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/User Stuff/Documents/GitHub/ECE244-Labs/Lab4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
