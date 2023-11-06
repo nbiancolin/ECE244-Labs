@@ -7,32 +7,53 @@ QueueList::QueueList() { head = nullptr; }
 QueueList::QueueList(Customer* customer) { head = customer; }
 
 QueueList::~QueueList() {
-  
+  //TODO: Learn how the constructor should work
 }
 
-Customer* QueueList::get_head() {  }
+Customer* QueueList::get_head() {  return head; }
 
 void QueueList::enqueue(Customer* customer) {
   // a customer is placed at the end of the queue
   // if the queue is empty, the customer becomes the head
-  
+  if(head == nullptr) head = customer;
+  else {
+      Customer *iterate = head;
+      while (iterate != nullptr) iterate = iterate->get_next();
+      iterate->set_next(customer); //TODO check this error
+  }
 }
 
 Customer* QueueList::dequeue() {
   // remove a customer from the head of the queue 
   // and return a pointer to it
-  
+  if(head == nullptr) return nullptr;
+  Customer* temp = head;
+  head = head->get_next();
+  return temp;
 }
 
 int QueueList::get_items() {
-  // count total number of items each customer in the queue has
+  Customer* iterate = head;
+  int sum = 0;
+  while(iterate != nullptr){
+      sum += iterate->get_numOfItems();
+      iterate = iterate->get_next();
+  }
+  return sum;
 }
 
 bool QueueList::empty_queue() {
   // if the queue is empty, return false
   // if the queue is not empty, delete all customers
   // and return true
-  
+  if(head == nullptr) return false;
+  Customer* iterate = head;
+  while(iterate != nullptr){
+      Customer* temp = iterate;
+      iterate = iterate->get_next();
+      delete temp;
+  }
+  return true;
 }
 
 void QueueList::print() {
