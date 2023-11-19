@@ -99,19 +99,29 @@ string getMode() {
 }
 
 void addCustomer(stringstream &lineStream, string mode) {
-  int items;
-  double timeElapsed;
-  if (!getInt(lineStream, items) || !getDouble(lineStream, timeElapsed)) {
-    cout << "Error: too few arguments." << endl;
-    return;
-  }
-  if (foundMoreArgs(lineStream)) {
-    cout << "Error: too many arguments." << endl;
-    return;
-  }
-  // Depending on the mode of the simulation (single or multiple),
-  // add the customer to the single queue or to the register with
-  // fewest items
+    int items;
+    double timeElapsed;
+    if (!getInt(lineStream, items) || !getDouble(lineStream, timeElapsed)) {
+        cout << "Error: too few arguments." << endl;
+        return;
+    }
+    if (foundMoreArgs(lineStream)) {
+        cout << "Error: too many arguments." << endl;
+        return;
+    }
+    if(mode == "multiple"){ // the one that makes the most fucking sense
+        //steps:
+        //find register with smallest queue
+
+        //add customer to that register
+
+
+
+
+    } //do we have to check for mode?
+    // Depending on the mode of the simulation (single or multiple),
+    // add the customer to the single queue or to the register with
+    // fewest items
   
 }
 
@@ -143,8 +153,18 @@ void openRegister(stringstream &lineStream, string mode) {
   }
 
   // Check if the register is already open
+  if(registerList->foundRegister(ID)){
+      cout << "Error: register " << ID << " is already open." << endl;
+      return;
+  }
   // If it's open, print an error message
   // Otherwise, open the register
+  Register* temp = new Register(ID, secPerItem, setupTime, timeElapsed);
+  registerList->enqueue(temp);
+  if(mode == "single") {
+      //take customer from queue and add them to list
+      temp->get_queue_list()->enqueue(singleQueue->dequeue());
+  }
   // If we were simulating a single queue, 
   // and there were customers in line, then 
   // assign a customer to the new register
@@ -152,21 +172,33 @@ void openRegister(stringstream &lineStream, string mode) {
 }
 
 void closeRegister(stringstream &lineStream, string mode) {
-  int ID;
-  double timeElapsed;
-  // convert string to int
-  if (!getInt(lineStream, ID) || !getDouble(lineStream, timeElapsed)) {
-    cout << "Error: too few arguments." << endl;
-    return;
-  }
-  if (foundMoreArgs(lineStream)) {
-    cout << "Error: too many arguments" << endl;
-    return;
-  }
-  // Check if the register is open
-  // If it is open dequeue it and free it's memory
-  // Otherwise, print an error message 
-  
+    int ID;
+    double timeElapsed;
+    // convert string to int
+    if (!getInt(lineStream, ID) || !getDouble(lineStream, timeElapsed)) {
+        cout << "Error: too few arguments." << endl;
+        return;
+    }
+    if (foundMoreArgs(lineStream)) {
+        cout << "Error: too many arguments" << endl;
+        return;
+    }
+    if(!registerList->foundRegister(ID)){ //checks if register is not open
+        // error message
+        cout << "Error: register " << ID << " is not open" << endl;
+        return;
+    }
+    Register* temp = registerList->get_head();
+    Register* prev = nullptr;
+    while(temp != nullptr){
+        if(temp->get_ID() == ID) break;
+        prev = temp;
+        temp = temp->get_next();
+    }
+    //dequeue temp
+    prev->set_next(temp->get_next());
+    delete temp;
+
 }
 
 bool getInt(stringstream &lineStream, int &iValue) {

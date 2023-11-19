@@ -54,7 +54,7 @@ void Register::departCustomer(QueueList* doneList) {
     if(queue == nullptr) return;
     if(queue->get_head() == nullptr) return;
     //queue->get_head()->set_departureTime(calculateDepartTime());
-    availableTime += queue->get_head()->get_departureTime(); //updates available time of register
+    availableTime += queue->get_head(); //updates available time of register
     doneList->enqueue(queue->dequeue()); //moves head customer to donelist
 
 }
