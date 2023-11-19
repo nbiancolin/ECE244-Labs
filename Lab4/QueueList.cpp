@@ -7,7 +7,8 @@ QueueList::QueueList() { head = nullptr; }
 QueueList::QueueList(Customer* customer) { head = customer; }
 
 QueueList::~QueueList() {
-  //TODO: Learn how the constructor should work
+  //TODO: Learn how the destructor should work
+  delete head;
 }
 
 Customer* QueueList::get_head() {  return head; }

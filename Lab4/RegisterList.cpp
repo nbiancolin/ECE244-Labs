@@ -6,7 +6,7 @@
 using namespace std;
 
 RegisterList::RegisterList() {
-  head = nullptr;
+  head = nullptr; //points to
   size = 0;
 }
 
