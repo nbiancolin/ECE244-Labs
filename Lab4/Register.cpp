@@ -44,17 +44,19 @@ double Register::calculateDepartTime() { //should be update / set lmao
     //return queue->get_head()->get_departureTime();
     //if they arrive after the current time or (check if arrival time is bigger than available time
     double depTime = secPerItem * queue->get_head()->get_numOfItems() + overheadPerCustomer;
-    if(queue->get_head()->get_arrivalTime() >= availableTime) return (depTime + queue->get_head()->get_arrivalTime());
-    else return depTime;
+    if(queue->get_head()->get_arrivalTime() >= availableTime) queue->get_head()->set_departureTime(depTime + queue->get_head()->get_arrivalTime());
+    else queue->get_head()->set_departureTime(depTime);
+    return queue->get_head()->get_departureTime();
 }
 
 void Register::departCustomer(QueueList* doneList) {
     // dequeue the head, set last dequeue time, add to doneList,
     if(queue == nullptr) return;
     if(queue->get_head() == nullptr) return;
-    availableTime += calculateDepartTime(); //updates available time of register
+    //queue->get_head()->set_departureTime(calculateDepartTime());
+    availableTime += queue->get_head()->get_departureTime(); //updates available time of register
     doneList->enqueue(queue->dequeue()); //moves head customer to donelist
-    
+
 }
 
 void Register::print() {
