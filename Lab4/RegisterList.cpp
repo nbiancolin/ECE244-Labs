@@ -35,7 +35,17 @@ Register* RegisterList::get_min_items_register() {
     Register* temp = head;
     Register* res = nullptr;
     while(temp != nullptr){
-        int num = temp->get_queue_list()->get_head()->get_numOfItems();
+        int num = temp->get_queue_list()->get_items();
+        /*
+        Customer* iterate = temp->get_queue_list()->get_head();
+        if(iterate == nullptr){ //checks if register is empty
+            return temp;
+        }
+        int num = iterate->get_numOfItems();
+        while(iterate->get_next() != nullptr){
+            iterate = iterate->get_next(); //checks items of all customers in queue
+            num += iterate->get_numOfItems();
+        }*/
         if(num < min || min < 0) {
             min = num;
             res = temp; //TODO: Does this work?

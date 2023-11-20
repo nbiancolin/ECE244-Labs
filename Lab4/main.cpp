@@ -33,6 +33,10 @@ bool getInt(stringstream &lineStream, int &iValue);
 bool getDouble(stringstream &lineStream, double &dValue);
 bool foundMoreArgs(stringstream &lineStream);
 
+void processCustomers();
+
+void printStatistics();
+
 // Global variables
 RegisterList *registerList; // holding the list of registers
 QueueList *doneList; // holding the list of customers served
@@ -72,14 +76,80 @@ int main() {
     } else {
       cout << "Invalid operation" << endl;
     }
+    //processCustomers(); -- Called in individual functions
     cout << "> ";  // Prompt for input
     getline(cin, line);
   }
 
   // You have to make sure all dynamically allocated memory is freed 
   // before return 0
+
+  //do stats
+  printStatistics();
+
+  //TODO free all dynamic memory
+
   return 0;
 }
+
+void printStatistics() {
+    cout << "Finished at time ";
+    cout << expTimeElapsed << endl;
+    cout << "Statistcs:" << endl;
+    cout << "Maximum wait time: ";
+    //cout << maxWaitTime << endl;
+    return;
+}
+
+void processCustomers(double time) {
+    //update system time
+    /**
+     * Every time a command is entered, apart from adding a customer, opening or closing a register, the system time
+     * has to be updated.
+     * The system time starts from 0, and it gets incremented with the elapsed time every command is entered.
+     * Along with the update in time, each register has to be checked.
+     *
+     * If the time taken to process the customer at the head of the queue of a register has passed, the customer has to depart.
+     * The time taken to process a customer is secPerItem of the register × items of the customer + setupTime of the register.
+     * If the customer at the head of the queue arrived after the register became available, then the departure time is the
+     * processing time of the customer plus the arrival time of the customer.
+     * Otherwise, the departure time is the processing time of the customer plus the time the register became available.
+     *
+     * Once it is time for a customer to depart, its departure time is updated, and the customer should leave the queue and
+     * get added to a linked list of customers that exited the system.
+     * This linked list would be of help when we calculate some statistics about the wait time of the simulation.
+     *
+     * If the simulation mode is “single”, as soon as a register departs a customer, another customer from the single queue
+     * should join this free register.
+     * Hint: We have to depart customers in order of their departure times, NOT by the order of registers in the linked list,
+     * to ensure customers get served by the correct registers.
+     * Also, the elapsed time can be enough to depart more than one customer, so it is important to check that we have departed
+     * enough customers from each register.
+     */
+
+    //1. update system time:
+    expTimeElapsed += time;
+
+    //2. check all registers
+    Register* head = registerList->get_head();
+    while(head != nullptr){
+        double temp = head->calculateDepartTime();
+        //TODO: pick up here
+
+
+
+
+
+
+
+        head = head->get_next();
+    }
+    //a. check if time has elapsed for customer to depart
+    //b if so,
+}
+
+
+
 
 string getMode() {
   string mode;
@@ -109,16 +179,22 @@ void addCustomer(stringstream &lineStream, string mode) {
         cout << "Error: too many arguments." << endl;
         return;
     }
+    Customer* next = new Customer(timeElapsed, items);
     if(mode == "multiple"){ // the one that makes the most fucking sense
         //steps:
         //find register with smallest queue
+        Register* res = registerList->get_free_register();
+        if(res == nullptr) res = registerList->get_min_items_register(); //if no free registers, find the register with the minimum number of items
+        res->get_queue_list()->enqueue(next); // adds customer to register
 
-        //add customer to that register
-
-
-
-
-    } //do we have to check for mode?
+    } else if(mode == "single"){
+        //in this case, add customer to queue list
+        if(registerList->get_head()->get_queue_list()->get_head() == nullptr){
+            registerList->get_head()->get_queue_list()->enqueue(next);
+        } else{
+            singleQueue->enqueue(next);
+        }
+    }//do we have to check for mode?
     // Depending on the mode of the simulation (single or multiple),
     // add the customer to the single queue or to the register with
     // fewest items
@@ -197,7 +273,7 @@ void closeRegister(stringstream &lineStream, string mode) {
     }
     //dequeue temp
     prev->set_next(temp->get_next());
-    delete temp;
+    delete temp;  //TODO: check if customers are in queue and move them around
 
 }
 
