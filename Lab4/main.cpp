@@ -101,7 +101,7 @@ void printStatistics() {
     return;
 }
 
-void processCustomers(double time) {
+void processCustomers(double time, string mode) {
     //update system time
     /**
      * Every time a command is entered, apart from adding a customer, opening or closing a register, the system time
@@ -129,13 +129,33 @@ void processCustomers(double time) {
 
     //1. update system time:
     expTimeElapsed += time;
+    double internalTime = time;
+    if(mode == "single") goto single;
+    else if(mode == "multiple") goto multiple;
 
+single:
+{
     //2. check all registers
     Register* head = registerList->get_head();
     while(head != nullptr){
-        double temp = head->calculateDepartTime();
+        double headCustomerTime = head->calculateDepartTime();
         //TODO: pick up here
+        //calc departure time
+        //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
+        while(headCustomerTime <= expTimeElapsed){
+            
+        }
 
+        /*
+        while(headCustomerTime <= internalTime){    //if customer is finished within time
+            //dequeue customer
+            internalTime = internalTime - headCustomerTime;
+            head->departCustomer(doneList);
+            head->get_queue_list()->enqueue(singleQueue->dequeue());
+            head->get_queue_list()->get_head()->set_arrivalTime()
+            headCustomerTime = head->calculateDepartTime();
+        }  */
+        //compute offset time (if the cashier only makes it through half of the items
 
 
 
@@ -146,6 +166,11 @@ void processCustomers(double time) {
     }
     //a. check if time has elapsed for customer to depart
     //b if so,
+}
+multiple:
+{
+
+}
 }
 
 
@@ -198,7 +223,7 @@ void addCustomer(stringstream &lineStream, string mode) {
     // Depending on the mode of the simulation (single or multiple),
     // add the customer to the single queue or to the register with
     // fewest items
-  
+    processCustomers(timeElapsed, mode);
 }
 
 void parseRegisterAction(stringstream &lineStream, string mode) {
@@ -244,7 +269,7 @@ void openRegister(stringstream &lineStream, string mode) {
   // If we were simulating a single queue, 
   // and there were customers in line, then 
   // assign a customer to the new register
-  
+  processCustomers(timeElapsed, mode);
 }
 
 void closeRegister(stringstream &lineStream, string mode) {
@@ -274,7 +299,7 @@ void closeRegister(stringstream &lineStream, string mode) {
     //dequeue temp
     prev->set_next(temp->get_next());
     delete temp;  //TODO: check if customers are in queue and move them around
-
+    processCustomers(timeElapsed, mode)
 }
 
 bool getInt(stringstream &lineStream, int &iValue) {
