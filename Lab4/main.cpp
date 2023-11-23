@@ -105,7 +105,7 @@ void printStatistics() {
     return;
 }
 
-void processCustomers(double time, string mode) {
+void processCustomers(double time, string &mode) {
     //update system time
     /**
      * Every time a command is entered, apart from adding a customer, opening or closing a register, the system time
@@ -138,6 +138,36 @@ void processCustomers(double time, string mode) {
     else if(mode == "multiple") goto multiple;
 
 single:
+    {
+        //step 1. depart any customers that can leave.
+
+        //2. add customers from singleQueue to all remaining registers
+
+        //go back to step 1 until there are no more customers that can leave
+
+
+
+        Register* best = registerList->calculateMinDepartTimeRegister(time);
+        if(best == nullptr) cout << "do something";
+        best->get_queue_list()->enqueue();
+        //queue customers
+        while(best->calculateDepartTime() < time){
+
+            //calculate departure time of customer
+            //add them to register with minimum most items
+            //after this is all done, depart all customers
+            //singleQueue->
+
+        }
+        Register* head = registerList->get_head();
+        while(head != nullptr){
+
+        }
+    }
+
+
+
+oldSingle:
 {
     //2. check all registers
     Register* head = registerList->get_head();
@@ -159,6 +189,7 @@ single:
     }
     //a. check if time has elapsed for customer to depart
     //b if so,
+    return;
 }
 multiple:
 {
@@ -181,6 +212,7 @@ multiple:
         }
         head = head->get_next(); //loops through all registers
     }
+    return;
 }
 }
 
@@ -310,7 +342,7 @@ void closeRegister(stringstream &lineStream, string mode) {
     //dequeue temp
     prev->set_next(temp->get_next());
     delete temp;  //TODO: check if customers are in queue and move them around
-    processCustomers(timeElapsed, mode)
+    processCustomers(timeElapsed, mode);
 }
 
 bool getInt(stringstream &lineStream, int &iValue) {
