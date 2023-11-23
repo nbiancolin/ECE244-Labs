@@ -89,6 +89,10 @@ int main() {
 
   //TODO free all dynamic memory
 
+  delete registerList;
+  delete doneList;
+  delete singleQueue;
+
   return 0;
 }
 

@@ -15,7 +15,10 @@ Register::Register(int id, double timePerItem, double overhead,
                             // queue
 }
 
-Register::~Register() { }//do I need a delete in here?
+Register::~Register() {
+    delete queue;
+    delete next;
+}
 
 QueueList* Register::get_queue_list() {return queue;}
 
@@ -43,9 +46,10 @@ double Register::calculateDepartTime() { //should be update / set lmao
     if(queue->get_head() == nullptr) return -1;
     //return queue->get_head()->get_departureTime();
     //if they arrive after the current time or (check if arrival time is bigger than available time
-    double depTime = queue->get_head()->get_arrivalTime() + secPerItem * queue->get_head()->get_numOfItems() + overheadPerCustomer; //TODO: Check if this function work corectly
-    if(queue->get_head()->get_arrivalTime() >= availableTime) queue->get_head()->set_departureTime(depTime + queue->get_head()->get_arrivalTime());
-    else queue->get_head()->set_departureTime(depTime);
+    double depTime = queue->get_head()->get_arrivalTime() + secPerItem * queue->get_head()->get_numOfItems() + overheadPerCustomer; //TODO This is definitely not right
+    //if(queue->get_head()->get_arrivalTime() >= availableTime) queue->get_head()->set_departureTime(depTime + queue->get_head()->get_arrivalTime());
+    //else queue->get_head()->set_departureTime(depTime);
+    queue->get_head()->set_departureTime(depTime);
     return queue->get_head()->get_departureTime();
 }
 
