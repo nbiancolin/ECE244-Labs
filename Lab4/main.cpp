@@ -33,7 +33,6 @@ bool getInt(stringstream &lineStream, int &iValue);
 bool getDouble(stringstream &lineStream, double &dValue);
 bool foundMoreArgs(stringstream &lineStream);
 
-void processCustomers();
 
 void printStatistics();
 
@@ -147,37 +146,16 @@ void printStatistics() {
     cout << stdDev(mean) << endl;
 }
 
-void processCustomers(double time, string &mode) {
-    //update system time
-    /**
-     * Every time a command is entered, apart from adding a customer, opening or closing a register, the system time
-     * has to be updated.
-     * The system time starts from 0, and it gets incremented with the elapsed time every command is entered.
-     * Along with the update in time, each register has to be checked.
-     *
-     * If the time taken to process the customer at the head of the queue of a register has passed, the customer has to depart.
-     * The time taken to process a customer is secPerItem of the register × items of the customer + setupTime of the register.
-     * If the customer at the head of the queue arrived after the register became available, then the departure time is the
-     * processing time of the customer plus the arrival time of the customer.
-     * Otherwise, the departure time is the processing time of the customer plus the time the register became available.
-     *
-     * Once it is time for a customer to depart, its departure time is updated, and the customer should leave the queue and
-     * get added to a linked list of customers that exited the system.
-     * This linked list would be of help when we calculate some statistics about the wait time of the simulation.
-     *
-     * If the simulation mode is “single”, as soon as a register departs a customer, another customer from the single queue
-     * should join this free register.
-     * Hint: We have to depart customers in order of their departure times, NOT by the order of registers in the linked list,
-     * to ensure customers get served by the correct registers.
-     * Also, the elapsed time can be enough to depart more than one customer, so it is important to check that we have departed
-     * enough customers from each register.
-     */
+void processCustomers(double time, string &mode, string src) {
 
     //1. update system time:
     double curTime = expTimeElapsed;
     expTimeElapsed += time;
     if(mode == "single") goto single;
     else if(mode == "multiple") goto multiple;
+
+    //if src is add, have to print "customer entered"
+
 
 single:
     {
@@ -198,19 +176,31 @@ single:
         //maxTime == expTimeElapsed
         //current time == curTime
 
+        //for singleQueue, if there is a register with no one in its queue, add someone from the single queue.
         Register* iterate = registerList->get_head();
+        while(iterate != nullptr && singleQueue->get_head() != nullptr){
+            if(iterate->get_queue_list()->get_head() == nullptr) {
+                iterate->get_queue_list()->enqueue(singleQueue->dequeue());
+                cout << "Queued a customer with quickest register " << iterate->get_ID() << endl;
+            }
+            iterate = iterate->get_next();
+        }
+
+        iterate = registerList->get_head();
         //int i = 0;
         while(iterate != nullptr){ //calculates all departure times
-            iterate->calculateDepartTime();
+            iterate->calculateDepartTime(); //checks if there is actually a customer to compute the depaarture time of
             iterate = iterate->get_next();
         }
         //find one with minimum
         curTime = findEarliestDeparture(iterate);
-        while(curTime <= expTimeElapsed){
+        while(curTime != -1 && curTime <= expTimeElapsed){
             //depart customer, queue next and calc departure time, and continue checking, set curTime to dep time
             curTime = iterate->get_queue_list()->get_head()->get_departureTime();
             iterate->departCustomer(doneList);
+            cout << "Departed a customer at register ID " << iterate->get_ID() << " at " << curTime << endl;
             iterate->get_queue_list()->enqueue(singleQueue->dequeue());
+            cout << "Queued a customer with quickest register " << iterate->get_ID() << endl;
             iterate->calculateDepartTime();
             curTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
         }
@@ -243,24 +233,54 @@ oldSingle: //deprecated
     //b if so,
     return;
 }
-multiple:
+
+multiple: //need to account for if individual queues
+    {
+        Register* iterate = registerList->get_head();
+        //int i = 0;
+        while(iterate != nullptr){ //calculates all departure times
+            iterate->calculateDepartTime();
+            iterate = iterate->get_next();
+        }
+        //find one with minimum
+        curTime = findEarliestDeparture(iterate);
+        while(curTime != -1 && curTime <= expTimeElapsed){
+            //depart customer, queue next and calc departure time, and continue checking, set curTime to dep time
+            curTime = iterate->get_queue_list()->get_head()->get_departureTime();
+            iterate->departCustomer(doneList);
+            //iterate->get_queue_list()->enqueue(singleQueue->dequeue());
+            iterate->calculateDepartTime();
+            curTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
+        }
+        return;
+
+        return;
+    }
+
+
+oldMultiple:
     {
         //one queue for each register, so a smidge easier
         //2. check all registers
         Register* head = registerList->get_head();
         while(head != nullptr){
-            double headCustomerTime = head->calculateDepartTime();
-            //TODO: pick up here
-            //calc departure time
-            //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
-            while(headCustomerTime <= expTimeElapsed){
-                //dequeue all customers in register until no time left
-                head->departCustomer(doneList);
-                //doneList->enqueue(head->get_queue_list()->dequeue());
-                //head->get_queue_list()->enqueue(singleQueue->dequeue()); No need for this since queue list is already updated
-                head->get_queue_list()->get_head()->set_arrivalTime(headCustomerTime);//arrives right when person leaves
-                headCustomerTime = head->calculateDepartTime();
-                //no need to take in account extra stuff, since all synced with system time will be all good
+            if(head->get_queue_list()->get_head() != nullptr) {
+                double headCustomerTime = head->calculateDepartTime();
+                //TODO: pick up here
+                //calc departure time
+                //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
+                while (headCustomerTime <= expTimeElapsed) {
+                    //dequeue all customers in register until no time left
+                    //cout << "Departed a customer at register "
+                    head->departCustomer(doneList);
+
+                    //doneList->enqueue(head->get_queue_list()->dequeue());
+                    //head->get_queue_list()->enqueue(singleQueue->dequeue()); No need for this since queue list is already updated
+                    head->get_queue_list()->get_head()->set_arrivalTime(
+                            headCustomerTime);//arrives right when person leaves
+                    headCustomerTime = head->calculateDepartTime();
+                    //no need to take in account extra stuff, since all synced with system time will be all good
+                }
             }
             head = head->get_next(); //loops through all registers
         }
@@ -274,9 +294,11 @@ double findEarliestDeparture(Register* &res){
     //Register* res = nullptr;
     double temp = -1;
     while(iterate != nullptr){
-        if(temp < 0 || iterate->get_queue_list()->get_head()->get_departureTime() < temp){
-            res = iterate;
-            temp = iterate->get_queue_list()->get_head()->get_departureTime(); //rather than re-calculate it every time, just get the value
+        if(iterate->get_queue_list()->get_head() != nullptr) {
+            if (temp < 0 || iterate->get_queue_list()->get_head()->get_departureTime() < temp) {
+                res = iterate;
+                temp = iterate->get_queue_list()->get_head()->get_departureTime(); //rather than re-calculate it every time, just get the value
+            }
         }
         iterate = iterate->get_next();
     }
@@ -312,26 +334,38 @@ void addCustomer(stringstream &lineStream, string mode) {
         cout << "Error: too many arguments." << endl;
         return;
     }
-    Customer* next = new Customer(timeElapsed, items);
-    if(mode == "multiple"){ // the one that makes the most fucking sense
-        //steps:
-        //find register with smallest queue
-        Register* res = registerList->get_free_register();
-        if(res == nullptr) res = registerList->get_min_items_register(); //if no free registers, find the register with the minimum number of items
-        res->get_queue_list()->enqueue(next); // adds customer to register
 
-    } else if(mode == "single"){
-        //in this case, add customer to queue list
-        if(registerList->get_head()->get_queue_list()->get_head() == nullptr){
-            registerList->get_head()->get_queue_list()->enqueue(next);
-        } else{
-            singleQueue->enqueue(next);
+    processCustomers(timeElapsed, mode, "add");
+    Customer* next = new Customer(expTimeElapsed, items);
+    cout << "A customer entered" << endl; //since the customer arrives after the deadline
+    if(mode == "multiple") { // the one that makes the most fucking sense
+        //new steps
+        //when adding a customer, the customer that is just added is queueud last (maybe just do it manually?)
+        //queue to quickest register
+        Register *temp = registerList->get_free_register();
+        if (temp == nullptr) temp = registerList->get_min_items_register();
+        //findEarliestDeparture(temp); //can't actually use this
+        temp->get_queue_list()->enqueue(next);
+        cout << "Queued a customer with quickest register " << temp->get_ID() << endl;
+        return;
+    }
+    if(mode == "single"){
+        cout << "A customer entered" << endl;
+        singleQueue->enqueue(next);
+        //check if customer should get queued in a register
+        Register* iterate = registerList->get_head();
+        while(iterate != nullptr){
+            //find if there is an empty register
+            if(iterate->get_queue_list()->get_head() == nullptr) {
+                iterate->get_queue_list()->enqueue(next);
+                cout << "Queued a customer with quickest register " << iterate->get_ID() << endl;
+                return;
+            }
+            iterate = iterate->get_next();
         }
-    }//do we have to check for mode?
-    // Depending on the mode of the simulation (single or multiple),
-    // add the customer to the single queue or to the register with
-    // fewest items
-    processCustomers(timeElapsed, mode);
+        singleQueue->enqueue(next);
+    }
+
 }
 
 void parseRegisterAction(stringstream &lineStream, string mode) {
@@ -368,16 +402,17 @@ void openRegister(stringstream &lineStream, string mode) {
   }
   // If it's open, print an error message
   // Otherwise, open the register
-  Register* temp = new Register(ID, secPerItem, setupTime, timeElapsed);
+  Register* temp = new Register(ID, secPerItem, setupTime, expTimeElapsed + timeElapsed);
   registerList->enqueue(temp);
-  if(mode == "single") {
-      //take customer from queue and add them to list
-      if(temp->get_queue_list() != nullptr && singleQueue->get_head() != nullptr) temp->get_queue_list()->enqueue(singleQueue->dequeue());
-  }
+  cout << "Opened register " << temp->get_ID() << endl;
+  //if(mode == "single") {
+  //    //take customer from queue and add them to list
+  //    if(temp->get_queue_list() != nullptr && singleQueue->get_head() != nullptr) temp->get_queue_list()->enqueue(singleQueue->dequeue());
+  //}
   // If we were simulating a single queue, 
   // and there were customers in line, then 
   // assign a customer to the new register
-  processCustomers(timeElapsed, mode);
+    processCustomers(timeElapsed, mode, "open");
 }
 
 void closeRegister(stringstream &lineStream, string mode) {
@@ -407,7 +442,7 @@ void closeRegister(stringstream &lineStream, string mode) {
     //dequeue temp
     prev->set_next(temp->get_next());
     delete temp;  //TODO: check if customers are in queue and move them around
-    processCustomers(timeElapsed, mode);
+    processCustomers(timeElapsed, mode, "close");
 }
 
 bool getInt(stringstream &lineStream, int &iValue) {
