@@ -37,6 +37,8 @@ void processCustomers();
 
 void printStatistics();
 
+double findEarliestDeparture(Register* &res);
+
 // Global variables
 RegisterList *registerList; // holding the list of registers
 QueueList *doneList; // holding the list of customers served
@@ -96,13 +98,53 @@ int main() {
   return 0;
 }
 
+double maxWaitTime(){
+    Customer * iterate = doneList->get_head();
+    double res = 0;
+    double temp;
+    while(iterate != nullptr){
+        temp = iterate->get_departureTime() - iterate->get_arrivalTime();
+        if(temp > res) res = temp;
+        iterate = iterate->get_next();
+    }
+    return res;
+}
+
+double avgWaitTime(){
+    //count all customers for total
+    //sum them all
+    Customer* iterate = doneList->get_head();
+    double num = 0, denom = 0;
+    while(iterate != nullptr){
+        ++denom;
+        num += iterate->get_departureTime() - iterate->get_arrivalTime();
+        iterate = iterate->get_next();
+    }
+    return (num / denom);
+}
+
+double stdDev(double avg){
+    Customer* iterate = doneList->get_head();
+    double num = 0, denom = 0;
+    while(iterate != nullptr){
+        num += pow(iterate->get_departureTime() - iterate->get_arrivalTime() - avg, 2);
+        ++denom;
+        iterate = iterate->get_next();
+    }
+    return pow((num / denom), 0.5);
+}
+
 void printStatistics() {
     cout << "Finished at time ";
     cout << expTimeElapsed << endl;
     cout << "Statistcs:" << endl;
     cout << "Maximum wait time: ";
-    //cout << maxWaitTime << endl;
-    return;
+    cout << maxWaitTime() << endl;
+    cout << "Average wait time: ";
+    double mean = avgWaitTime();
+    cout << mean << endl;
+    cout << "Standard Deviation of wait time: ";
+    cout << stdDev(mean) << endl;
 }
 
 void processCustomers(double time, string &mode) {
@@ -132,42 +174,52 @@ void processCustomers(double time, string &mode) {
      */
 
     //1. update system time:
+    double curTime = expTimeElapsed;
     expTimeElapsed += time;
-    double internalTime = time;
     if(mode == "single") goto single;
     else if(mode == "multiple") goto multiple;
 
 single:
     {
-        //step 1. depart any customers that can leave.
+        /**
+         * Lets think about this as if it were a real grocery store and go from there
+         *
+         * in a grocery store, when all the customers are waiting in one line,
+         * once a register is finished, it calls the next customer in line
+         */
+        /**
+         * so, in the context of this code
+         *
+         * we have a max time limit and a "current time"
+         * going through all registers, checking for which one will be the first to depart a customer.
+         * while that departure time is less than the max time limit, depart that customer, add another to the queue and compute its departure time
+         * and continue to check for whichever has the soonest departure time, and that the soonest time is below the current time
+         */
+        //maxTime == expTimeElapsed
+        //current time == curTime
 
-        //2. add customers from singleQueue to all remaining registers
-
-        //go back to step 1 until there are no more customers that can leave
-
-
-
-        Register* best = registerList->calculateMinDepartTimeRegister(time);
-        if(best == nullptr) cout << "do something";
-        best->get_queue_list()->enqueue();
-        //queue customers
-        while(best->calculateDepartTime() < time){
-
-            //calculate departure time of customer
-            //add them to register with minimum most items
-            //after this is all done, depart all customers
-            //singleQueue->
-
+        Register* iterate = registerList->get_head();
+        //int i = 0;
+        while(iterate != nullptr){ //calculates all departure times
+            iterate->calculateDepartTime();
+            iterate = iterate->get_next();
         }
-        Register* head = registerList->get_head();
-        while(head != nullptr){
-
+        //find one with minimum
+        curTime = findEarliestDeparture(iterate);
+        while(curTime <= expTimeElapsed){
+            //depart customer, queue next and calc departure time, and continue checking, set curTime to dep time
+            curTime = iterate->get_queue_list()->get_head()->get_departureTime();
+            iterate->departCustomer(doneList);
+            iterate->get_queue_list()->enqueue(singleQueue->dequeue());
+            iterate->calculateDepartTime();
+            curTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
         }
+        return;
     }
 
 
 
-oldSingle:
+oldSingle: //deprecated
 {
     //2. check all registers
     Register* head = registerList->get_head();
@@ -192,31 +244,44 @@ oldSingle:
     return;
 }
 multiple:
-{
-    //one queue for each register, so a smidge easier
-    //2. check all registers
-    Register* head = registerList->get_head();
-    while(head != nullptr){
-        double headCustomerTime = head->calculateDepartTime();
-        //TODO: pick up here
-        //calc departure time
-        //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
-        while(headCustomerTime <= expTimeElapsed){
-            //dequeue all customers in register until no time left
-            head->departCustomer(doneList);
-            //doneList->enqueue(head->get_queue_list()->dequeue());
-            //head->get_queue_list()->enqueue(singleQueue->dequeue()); No need for this since queue list is already updated
-            head->get_queue_list()->get_head()->set_arrivalTime(headCustomerTime);//arrives right when person leaves
-            headCustomerTime = head->calculateDepartTime();
-            //no need to take in account extra stuff, since all synced with system time will be all good
+    {
+        //one queue for each register, so a smidge easier
+        //2. check all registers
+        Register* head = registerList->get_head();
+        while(head != nullptr){
+            double headCustomerTime = head->calculateDepartTime();
+            //TODO: pick up here
+            //calc departure time
+            //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
+            while(headCustomerTime <= expTimeElapsed){
+                //dequeue all customers in register until no time left
+                head->departCustomer(doneList);
+                //doneList->enqueue(head->get_queue_list()->dequeue());
+                //head->get_queue_list()->enqueue(singleQueue->dequeue()); No need for this since queue list is already updated
+                head->get_queue_list()->get_head()->set_arrivalTime(headCustomerTime);//arrives right when person leaves
+                headCustomerTime = head->calculateDepartTime();
+                //no need to take in account extra stuff, since all synced with system time will be all good
+            }
+            head = head->get_next(); //loops through all registers
         }
-        head = head->get_next(); //loops through all registers
+        return;
     }
-    return;
-}
 }
 
 
+double findEarliestDeparture(Register* &res){
+    Register* iterate = registerList->get_head();
+    //Register* res = nullptr;
+    double temp = -1;
+    while(iterate != nullptr){
+        if(temp < 0 || iterate->get_queue_list()->get_head()->get_departureTime() < temp){
+            res = iterate;
+            temp = iterate->get_queue_list()->get_head()->get_departureTime(); //rather than re-calculate it every time, just get the value
+        }
+        iterate = iterate->get_next();
+    }
+    return temp;
+}
 
 
 string getMode() {
@@ -307,7 +372,7 @@ void openRegister(stringstream &lineStream, string mode) {
   registerList->enqueue(temp);
   if(mode == "single") {
       //take customer from queue and add them to list
-      temp->get_queue_list()->enqueue(singleQueue->dequeue());
+      if(temp->get_queue_list() != nullptr && singleQueue->get_head() != nullptr) temp->get_queue_list()->enqueue(singleQueue->dequeue());
   }
   // If we were simulating a single queue, 
   // and there were customers in line, then 

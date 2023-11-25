@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/Nicholas/Documents/GitHub/ECE244-Labs/Lab4/cmake-build-debug",
-		"source" : "C:/Users/Nicholas/Documents/GitHub/ECE244-Labs/Lab4"
+		"build" : "D:/User Stuff/Documents/GitHub/ECE244-Labs/Lab4/cmake-build-debug",
+		"source" : "D:/User Stuff/Documents/GitHub/ECE244-Labs/Lab4"
 	},
 	"version" : 
 	{

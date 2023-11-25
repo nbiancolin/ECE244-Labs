@@ -1,0 +1,9 @@
+# ninja log v5
+9	363	7226388076517511	CMakeFiles/Lab4.dir/QueueList.cpp.obj	206402f1a901eb75
+4	381	7226388076697534	CMakeFiles/Lab4.dir/RegisterList.cpp.obj	b993b82fe98d15b3
+11	386	7226388076757538	CMakeFiles/Lab4.dir/Customer.cpp.obj	7ba7ad0a974ab1f5
+6	396	7226388076858447	CMakeFiles/Lab4.dir/Register.cpp.obj	ab0e300cdd15f8e8
+0	564	7226388078527550	CMakeFiles/Lab4.dir/main.cpp.obj	b12c670208628d4c
+564	676	7226388079637886	Lab4.exe	279498ada488d8ed
+2	489	7226409569501343	CMakeFiles/Lab4.dir/main.cpp.obj	b12c670208628d4c
+489	584	7226409570441344	Lab4.exe	279498ada488d8ed
