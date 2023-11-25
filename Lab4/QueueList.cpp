@@ -19,8 +19,10 @@ void QueueList::enqueue(Customer* customer) {
   if(head == nullptr) head = customer;
   else {
       Customer *iterate = head;
-      while (iterate != nullptr) iterate = iterate->get_next();
-      iterate->set_next(customer); //TODO check this error
+        while (iterate->get_next() != nullptr) {
+            iterate = iterate->get_next();
+        }
+        iterate->set_next(customer);
   }
 }
 

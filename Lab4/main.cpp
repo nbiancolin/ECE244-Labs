@@ -345,12 +345,12 @@ void addCustomer(stringstream &lineStream, string mode) {
         Register *temp = registerList->get_free_register();
         if (temp == nullptr) temp = registerList->get_min_items_register();
         //findEarliestDeparture(temp); //can't actually use this
-        temp->get_queue_list()->enqueue(next);
+        temp->get_queue_list()->enqueue(next); //problem here
         cout << "Queued a customer with quickest register " << temp->get_ID() << endl;
         return;
     }
     if(mode == "single"){
-        cout << "A customer entered" << endl;
+        //cout << "A customer entered" << endl;
         singleQueue->enqueue(next);
         //check if customer should get queued in a register
         Register* iterate = registerList->get_head();
