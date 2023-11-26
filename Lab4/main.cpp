@@ -236,7 +236,34 @@ oldSingle: //deprecated
 
 multiple: //need to account for if individual queues
     {
+        /**
+         *  we have a max time limit and a "current time"
+         * going through all registers, checking for which one will be the first to depart a customer.
+         * while that departure time is less than the max time limit, depart that customer, add another to the queue and compute its departure time
+         * and continue to check for whichever has the soonest departure time, and that the soonest time is below the current time
+         */
         Register* iterate = registerList->get_head();
+        while(iterate != nullptr){ //calculates all the departure times
+            iterate->calculateDepartTime();
+            iterate = iterate->get_next();
+        }
+
+        //go through all registers to check for which will be the first to depart a customer
+        double iterateTime = findEarliestDeparture(iterate);
+        while(iterateTime < expTimeElapsed && iterateTime > 0){ //the above fn returns -1 if no register is found
+            //only triggered if there is a register with someone that departs
+            //depart customer (announce it too)
+            cout << "Departed a customer at register ID " << iterate->get_ID() << " at " << iterateTime << endl;
+            iterate->departCustomer(doneList);
+            iterate->calculateDepartTime();
+            iterateTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
+        }
+
+
+
+
+
+        //Register* iterate = registerList->get_head();
         //int i = 0;
         while(iterate != nullptr){ //calculates all departure times
             iterate->calculateDepartTime();
@@ -289,21 +316,22 @@ oldMultiple:
 }
 
 
-double findEarliestDeparture(Register* &res){
+double findEarliestDeparture(Register* &res) {
     Register* iterate = registerList->get_head();
-    //Register* res = nullptr;
     double temp = -1;
     while(iterate != nullptr){
         if(iterate->get_queue_list()->get_head() != nullptr) {
-            if (temp < 0 || iterate->get_queue_list()->get_head()->get_departureTime() < temp) {
+            double currentDepartureTime = iterate->get_queue_list()->get_head()->get_departureTime();
+            if (temp < 0 || currentDepartureTime < temp) {
                 res = iterate;
-                temp = iterate->get_queue_list()->get_head()->get_departureTime(); //rather than re-calculate it every time, just get the value
+                temp = currentDepartureTime;
             }
         }
         iterate = iterate->get_next();
     }
     return temp;
 }
+
 
 
 string getMode() {
