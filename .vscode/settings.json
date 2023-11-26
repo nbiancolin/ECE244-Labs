@@ -1,3 +1,4 @@
 {
-    "makefile.makefilePath": "./Lab4/Makefile"
+    "makefile.makefilePath": "./Lab4/Makefile",
+    "cmake.sourceDirectory": "/u/a/biancol6/ECE244-Labs-1/Lab4"
 }
