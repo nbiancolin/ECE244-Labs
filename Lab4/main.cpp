@@ -151,31 +151,7 @@ int processCustomers(double time, string &mode, string src) {
     //1. update system time:
     double curTime = expTimeElapsed;
     expTimeElapsed += time;
-    if(mode == "single") goto single;
-    else if(mode == "multiple") goto multiple;
-
-    //if src is add, have to print "customer entered"
-
-
-single:
-    {
-        /**
-         * Lets think about this as if it were a real grocery store and go from there
-         *
-         * in a grocery store, when all the customers are waiting in one line,
-         * once a register is finished, it calls the next customer in line
-         */
-        /**
-         * so, in the context of this code
-         *
-         * we have a max time limit and a "current time"
-         * going through all registers, checking for which one will be the first to depart a customer.
-         * while that departure time is less than the max time limit, depart that customer, add another to the queue and compute its departure time
-         * and continue to check for whichever has the soonest departure time, and that the soonest time is below the current time
-         */
-        //maxTime == expTimeElapsed
-        //current time == curTime
-
+    if(mode == "single"){
         //for singleQueue, if there is a register with no one in its queue, add someone from the single queue.
         Register* iterate = registerList->get_head();
         while(iterate != nullptr && singleQueue->get_head() != nullptr){
@@ -207,42 +183,7 @@ single:
         }
         return 0;
     }
-
-
-
-oldSingle: //deprecated
-{
-    //2. check all registers
-    Register* head = registerList->get_head();
-    while(head != nullptr){  //TODO: Maybe need a better way to go through registers
-        double headCustomerTime = head->calculateDepartTime();
-        //TODO: pick up here
-        //calc departure time
-        //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
-        while(headCustomerTime <= expTimeElapsed){
-            //dequeue all customers in register until no time left
-            head->departCustomer(doneList);
-            //doneList->enqueue(head->get_queue_list()->dequeue());
-            head->get_queue_list()->enqueue(singleQueue->dequeue());
-            head->get_queue_list()->get_head()->set_arrivalTime(headCustomerTime);//arrives right when person leaves
-            headCustomerTime = head->calculateDepartTime();
-            //no need to take in account extra stuff, since all synced with system time will be all good
-        }
-        head = head->get_next(); //loops through all registers
-    }
-    //a. check if time has elapsed for customer to depart
-    //b if so,
-    return 5;
-}
-
-multiple: //need to account for if individual queues
-    {
-        /**
-         *  we have a max time limit and a "current time"
-         * going through all registers, checking for which one will be the first to depart a customer.
-         * while that departure time is less than the max time limit, depart that customer, add another to the queue and compute its departure time
-         * and continue to check for whichever has the soonest departure time, and that the soonest time is below the current time
-         */
+    else if(mode == "multiple"){
         Register* iterate = registerList->calculateMinDepartTimeRegister(expTimeElapsed);
 
 
@@ -258,36 +199,9 @@ multiple: //need to account for if individual queues
         }
         return 0;
     }
+    return -1;
 
-
-oldMultiple:
-    {
-        //one queue for each register, so a smidge easier
-        //2. check all registers
-        Register* head = registerList->get_head();
-        while(head != nullptr){
-            if(head->get_queue_list()->get_head() != nullptr) {
-                double headCustomerTime = head->calculateDepartTime();
-                //TODO: pick up here
-                //calc departure time
-                //if the system time is greater than their departure time, depart them and check remaining customers in queue until time runs out
-                while (headCustomerTime <= expTimeElapsed) {
-                    //dequeue all customers in register until no time left
-                    //cout << "Departed a customer at register "
-                    head->departCustomer(doneList);
-
-                    //doneList->enqueue(head->get_queue_list()->dequeue());
-                    //head->get_queue_list()->enqueue(singleQueue->dequeue()); No need for this since queue list is already updated
-                    head->get_queue_list()->get_head()->set_arrivalTime(
-                            headCustomerTime);//arrives right when person leaves
-                    headCustomerTime = head->calculateDepartTime();
-                    //no need to take in account extra stuff, since all synced with system time will be all good
-                }
-            }
-            head = head->get_next(); //loops through all registers
-        }
-        return 5;
-    }
+    //if src is add, have to print "customer entered"
 }
 
 
