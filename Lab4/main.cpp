@@ -341,16 +341,16 @@ void addCustomer(stringstream &lineStream, string mode) {
     int smtg = processCustomers(timeElapsed, mode, "add");
     Customer* next = new Customer(expTimeElapsed, items);
     cout << "A customer entered" << endl; //since the customer arrives after the deadline
-    if(smtg == -1){
-        cout << "No free registers" << endl;
-        return;
-    }
     if(mode == "multiple") { // the one that makes the most fucking sense
+        cout << "multiple";
         //new steps
         //when adding a customer, the customer that is just added is queueud last (maybe just do it manually?)
         //queue to quickest register
-        Register *temp = registerList->get_free_register();
-        if (temp == nullptr) temp = registerList->get_min_items_register();
+
+        //Register *temp = registerList->get_free_register();
+        //if (temp == nullptr) temp = registerList->get_min_items_register();
+        Register* temp = registerList->get_min_items_register();
+        //cout << "register gotten"; **DOES NOT REACH HERE**
         //findEarliestDeparture(temp); //can't actually use this
         temp->get_queue_list()->enqueue(next); //problem here
         cout << "Queued a customer with quickest register " << temp->get_ID() << endl;
@@ -360,17 +360,21 @@ void addCustomer(stringstream &lineStream, string mode) {
         //cout << "A customer entered" << endl;
         singleQueue->enqueue(next);
         //check if customer should get queued in a register
+        if(smtg == -1){
+            cout << "No free registers" << endl;
+            return;
+        }
         Register* iterate = registerList->get_head();
         while(iterate != nullptr){
             //find if there is an empty register
             if(iterate->get_queue_list()->get_head() == nullptr) {
-                iterate->get_queue_list()->enqueue(next);
-                cout << "Queued a customer with quickest register " << iterate->get_ID() << endl;
+                iterate->get_queue_list()->enqueue(singleQueue->dequeue());
+                cout << "Queued a customer with free register " << iterate->get_ID() << endl;
                 return;
             }
             iterate = iterate->get_next();
         }
-        singleQueue->enqueue(next);
+        //singleQueue->enqueue(next);
     }
 
 }

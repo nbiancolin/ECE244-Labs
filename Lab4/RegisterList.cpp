@@ -28,18 +28,20 @@ int RegisterList::get_size() {
 
 
 Register* RegisterList::get_min_items_register() {
-    // loop all registers to find the register with least number of items
-    int min = -1;
+    // loop through all registers to find the register with the least number of items
+    int min = INT_MAX; // initialize to a large value
     Register* temp = head;
     Register* res = nullptr;
-    while(temp != nullptr){
+
+    while (temp != nullptr) {
         int num = temp->get_queue_list()->get_items();
-        if(num < min || min < 0) {
+        if (num < min) {
             min = num;
-            res = temp; //TODO: Does this work?
+            res = temp;
         }
         temp = temp->get_next();
     }
+
     return res;
 }
 
