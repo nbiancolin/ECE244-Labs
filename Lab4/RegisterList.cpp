@@ -1,6 +1,7 @@
 #include "RegisterList.h"
 
 #include <iostream>
+#include <climits>
 
 #include "Register.h"
 using namespace std;

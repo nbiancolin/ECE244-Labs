@@ -189,7 +189,7 @@ int processCustomers(double time, string &mode, string src) {
 
         //go through all registers to check for which will be the first to depart a customer
         double iterateTime = findEarliestDeparture(iterate);
-        while(iterateTime < expTimeElapsed && iterateTime > 0){ //the above fn returns -1 if no register is found
+        while(iterateTime <= expTimeElapsed && iterateTime > 0){ //the above fn returns -1 if no register is found
             //only triggered if there is a register with someone that departs
             //depart customer (announce it too)
             cout << "Departed a customer at register ID " << iterate->get_ID() << " at " << iterateTime << endl;
@@ -289,6 +289,8 @@ void addCustomer(stringstream &lineStream, string mode) {
             iterate = iterate->get_next();
         }
         //singleQueue->enqueue(next);
+        cout << "poopy";
+        return;
     }
 
 }
