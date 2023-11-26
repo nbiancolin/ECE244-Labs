@@ -12,20 +12,18 @@ RegisterList::RegisterList() {
 
 RegisterList::~RegisterList() {
   // Delete all registers in the list
-  delete head;
+    Register* temp = head;
+    while (temp != nullptr) {
+        Register* next = temp->get_next();
+        delete temp;
+        temp = next;
+    }
 }
 
 Register* RegisterList::get_head() { return head; }
 
 int RegisterList::get_size() { 
-  // return number of registers
-  int sum = 0;
-  Register* temp = head;
-  while(temp != nullptr){
-      ++sum;
-      temp = temp->get_next();
-  }
-  return sum;
+  return size;
 }
 
 
@@ -36,16 +34,6 @@ Register* RegisterList::get_min_items_register() {
     Register* res = nullptr;
     while(temp != nullptr){
         int num = temp->get_queue_list()->get_items();
-        /*
-        Customer* iterate = temp->get_queue_list()->get_head();
-        if(iterate == nullptr){ //checks if register is empty
-            return temp;
-        }
-        int num = iterate->get_numOfItems();
-        while(iterate->get_next() != nullptr){
-            iterate = iterate->get_next(); //checks items of all customers in queue
-            num += iterate->get_numOfItems();
-        }*/
         if(num < min || min < 0) {
             min = num;
             res = temp; //TODO: Does this work?
@@ -69,17 +57,18 @@ Register* RegisterList::get_free_register() {
 void RegisterList::enqueue(Register* newRegister) {
   // a register is placed at the end of the queue
   // if the register's list is empty, the register becomes the head
-  if(head == nullptr) {
-      head = newRegister;
-      size++;
-      return;
-  }
-  Register* temp = head;
-  while(temp->get_next() != nullptr){
-      temp = temp->get_next();
-  }
-  temp->set_next(newRegister);
-  size++;
+    if (head == nullptr) {
+        head = newRegister;
+        size++;
+        return;
+    }
+    Register* temp = head;
+    while (temp->get_next() != nullptr) {
+        temp = temp->get_next();
+    }
+    temp->set_next(newRegister);
+    newRegister->set_next(nullptr);  // Set the next pointer to nullptr (just in case)
+    size++;
   // Assume the next of the newRegister is set to null
   // You will have to increment size
 }
@@ -107,9 +96,11 @@ Register* RegisterList::dequeue(int ID) {
     }
     return nullptr; //returns null if not found or if head is null
 found: {
+        Register* dequeue = temp;
         prev->set_next(temp->get_next()); //remove temp from the queue
+        dequeue->set_next(nullptr); //nothing is working nd I cant figue out why
         return temp; //returns dequeued register
-    };
+    }
 
 }
 
@@ -117,7 +108,7 @@ Register* RegisterList::calculateMinDepartTimeRegister(double expTimeElapsed) {
     // return the register with minimum time of departure of its customer
     if(head == nullptr) return nullptr;
     Register* res, *temp = head;
-    //doing firt round of calculations
+    //doing first round of calculations
     double min = head->calculateDepartTime();
     int counter = 0; //purpose of counter is to see if all registers are empty. Counter ticks up every time a register is 0
     if(min == 0) ++counter;

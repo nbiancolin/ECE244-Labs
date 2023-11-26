@@ -8,7 +8,12 @@ QueueList::QueueList(Customer* customer) { head = customer; }
 
 QueueList::~QueueList() {
   //TODO: Learn how the destructor should work
-  delete head;
+    Customer* temp = head;
+    while (temp != nullptr) {
+        Customer *next = temp->get_next();
+        delete temp;
+        temp = next;
+    }
 }
 
 Customer* QueueList::get_head() {  return head; }

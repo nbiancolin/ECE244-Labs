@@ -46,7 +46,13 @@ double Register::calculateDepartTime() { //should be update / set lmao
     if(queue->get_head() == nullptr) return -1;
     //return queue->get_head()->get_departureTime();
     //if they arrive after the current time or (check if arrival time is bigger than available time
-    double depTime = queue->get_head()->get_arrivalTime() + secPerItem * queue->get_head()->get_numOfItems() + overheadPerCustomer; //TODO This is definitely not right
+
+    double depTime = std::max(queue->get_head()->get_arrivalTime(), availableTime) + // no idea if this is better but we'll find out
+                     secPerItem * queue->get_head()->get_numOfItems() +
+                     overheadPerCustomer;
+
+
+    //double depTime = queue->get_head()->get_arrivalTime() + secPerItem * queue->get_head()->get_numOfItems() + overheadPerCustomer; //TODO This is definitely not right
     //if(queue->get_head()->get_arrivalTime() >= availableTime) queue->get_head()->set_departureTime(depTime + queue->get_head()->get_arrivalTime());
     //else queue->get_head()->set_departureTime(depTime);
     queue->get_head()->set_departureTime(depTime);

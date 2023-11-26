@@ -146,7 +146,7 @@ void printStatistics() {
     cout << stdDev(mean) << endl;
 }
 
-void processCustomers(double time, string &mode, string src) {
+int processCustomers(double time, string &mode, string src) {
 
     //1. update system time:
     double curTime = expTimeElapsed;
@@ -181,7 +181,7 @@ single:
         while(iterate != nullptr && singleQueue->get_head() != nullptr){
             if(iterate->get_queue_list()->get_head() == nullptr) {
                 iterate->get_queue_list()->enqueue(singleQueue->dequeue());
-                cout << "Queued a customer with quickest register " << iterate->get_ID() << endl;
+                cout << "Queued a customer with free register " << iterate->get_ID() << endl;
             }
             iterate = iterate->get_next();
         }
@@ -194,6 +194,7 @@ single:
         }
         //find one with minimum
         curTime = findEarliestDeparture(iterate);
+        if(curTime == -1) return -1;
         while(curTime != -1 && curTime <= expTimeElapsed){
             //depart customer, queue next and calc departure time, and continue checking, set curTime to dep time
             curTime = iterate->get_queue_list()->get_head()->get_departureTime();
@@ -204,7 +205,7 @@ single:
             iterate->calculateDepartTime();
             curTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
         }
-        return;
+        return 0;
     }
 
 
@@ -231,7 +232,7 @@ oldSingle: //deprecated
     }
     //a. check if time has elapsed for customer to depart
     //b if so,
-    return;
+    return 5;
 }
 
 multiple: //need to account for if individual queues
@@ -242,11 +243,8 @@ multiple: //need to account for if individual queues
          * while that departure time is less than the max time limit, depart that customer, add another to the queue and compute its departure time
          * and continue to check for whichever has the soonest departure time, and that the soonest time is below the current time
          */
-        Register* iterate = registerList->get_head();
-        while(iterate != nullptr){ //calculates all the departure times
-            iterate->calculateDepartTime();
-            iterate = iterate->get_next();
-        }
+        Register* iterate = registerList->calculateMinDepartTimeRegister(expTimeElapsed);
+
 
         //go through all registers to check for which will be the first to depart a customer
         double iterateTime = findEarliestDeparture(iterate);
@@ -258,30 +256,7 @@ multiple: //need to account for if individual queues
             iterate->calculateDepartTime();
             iterateTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
         }
-
-
-
-
-
-        //Register* iterate = registerList->get_head();
-        //int i = 0;
-        while(iterate != nullptr){ //calculates all departure times
-            iterate->calculateDepartTime();
-            iterate = iterate->get_next();
-        }
-        //find one with minimum
-        curTime = findEarliestDeparture(iterate);
-        while(curTime != -1 && curTime <= expTimeElapsed){
-            //depart customer, queue next and calc departure time, and continue checking, set curTime to dep time
-            curTime = iterate->get_queue_list()->get_head()->get_departureTime();
-            iterate->departCustomer(doneList);
-            //iterate->get_queue_list()->enqueue(singleQueue->dequeue());
-            iterate->calculateDepartTime();
-            curTime = findEarliestDeparture(iterate);//should keep getting rid and queueing people until time is up
-        }
-        return;
-
-        return;
+        return 0;
     }
 
 
@@ -311,7 +286,7 @@ oldMultiple:
             }
             head = head->get_next(); //loops through all registers
         }
-        return;
+        return 5;
     }
 }
 
@@ -363,9 +338,13 @@ void addCustomer(stringstream &lineStream, string mode) {
         return;
     }
 
-    processCustomers(timeElapsed, mode, "add");
+    int smtg = processCustomers(timeElapsed, mode, "add");
     Customer* next = new Customer(expTimeElapsed, items);
     cout << "A customer entered" << endl; //since the customer arrives after the deadline
+    if(smtg == -1){
+        cout << "No free registers" << endl;
+        return;
+    }
     if(mode == "multiple") { // the one that makes the most fucking sense
         //new steps
         //when adding a customer, the customer that is just added is queueud last (maybe just do it manually?)
