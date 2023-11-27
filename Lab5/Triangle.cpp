@@ -19,28 +19,34 @@ using namespace std;
 #include "Shape.h"
 #include "Triangle.h"
 
-Triangle::Triangle(string n, float xcent, float ycent, float b, float h){
-    base = b;
-    height = h;
+Triangle::Triangle(string n, float xcent, float ycent, float x_1, float y_1, float x_2, float y_2, float x_3, float y_3){
+    x1 = x_1;
+    y1 = y_1;
+    x2 = x_2;
+    y2 = y_2;
+    x3 = x_3;
+    y3 = y_3;
 }
 
 Triangle::~Triangle(){
     //nothing since no dynamic allocation
 }
 
-float Triangle::getLength() const{
+/*
+float Triangle::getLength() const{ //fix
     return base;
 }
 float Triangle::getWidth() const{
     return height;
 }
 
+
 void Triangle::setBase(float b){
     base = b;
 }
 void Triangle::setHeight(float h){
     height = h;
-}
+}*/
 
 void Triangle::draw() const{
     cout << std::fixed;
@@ -48,12 +54,15 @@ void Triangle::draw() const{
 
     cout << "triangle: " << name << " "
          << x_centre << " " << y_centre
-         << " " << length << " " << width  << " " << computeArea()
+         << " " << x1 << " " << y1
+        << " " << x2 << " " << y2
+        << " " << x3 << " " << y3
+        << " " << computeArea()
          << endl;
 }
 
 float Triangle::computeArea() const{
-    return length * width;
+    return 0.5 * (x1 (y2-y3) + x2(y3-y1) + x3(y1-y2));
 }
 
 Shape* Triangle::clone() const{
